@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"build": "next build",
-		"dev": "next dev",
+		"dev": "concurrently --names \"Next.js,Firebase\" -c \"blue.bold,yellow.bold\" \"next dev\" \"firebase emulators:start --only auth,firestore --import=./firebase --export-on-exit\"",
 		"lint": "next lint",
 		"prepare": "husky install",
 		"prettier": "prettier -w .",
@@ -14,11 +14,12 @@
 		"autoprefixer": "10.4.14",
 		"eslint": "8.41.0",
 		"eslint-config-next": "13.4.4",
+		"firebase": "^9.22.1",
 		"next": "13.4.4",
 		"postcss": "8.4.24",
-		"prettier": "^2.8.8",
 		"react": "18.2.0",
 		"react-dom": "18.2.0",
+		"react-firebase-hooks": "^5.1.1",
 		"tailwindcss": "3.3.2",
 		"typescript": "5.0.4"
 	},
@@ -26,7 +27,9 @@
 		"@types/node": "20.2.5",
 		"@types/react": "18.2.7",
 		"@types/react-dom": "18.2.4",
+		"concurrently": "^8.0.1",
 		"husky": "^8.0.3",
+		"prettier": "^2.8.8",
 		"prettier-quick": "^0.0.5"
 	}
 }
