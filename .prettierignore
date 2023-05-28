@@ -1,0 +1,14 @@
+# Output directory
+.dist
+
+# Package manager
+node_modules
+pnpm-lock.yaml
+
+# IDE settings
+.idea
+.
+
+# Configure files
+.turbo
+.husky
