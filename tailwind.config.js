@@ -4,14 +4,29 @@ module.exports = {
 		'./pages/**/*.{js,ts,jsx,tsx,mdx}',
 		'./components/**/*.{js,ts,jsx,tsx,mdx}',
 		'./app/**/*.{js,ts,jsx,tsx,mdx}',
+		'node_modules/daisyui/dist/**/*.js',
+		'node_modules/react-daisyui/dist/**/*.js',
 	],
-	theme: {
-		extend: {
-			backgroundImage: {
-				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-				'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+	theme: {},
+	plugins: [require('daisyui')],
+	daisyui: {
+		base: false,
+		themes: [
+			'light',
+			'dark',
+			{
+				mytheme: {
+					primary: '#fde047',
+					secondary: '#fde047',
+					accent: '#44403c',
+					neutral: '#191D24',
+					'base-100': '#f97316',
+					info: '#3ABFF8',
+					success: '#36D399',
+					warning: '#FBBD23',
+					error: '#F87272',
+				},
 			},
-		},
+		],
 	},
-	plugins: [],
 };
