@@ -1,22 +1,25 @@
 'use client';
 
-import { useIsAuthenticated } from '@/hooks/auth';
-import Login from '../login';
-import { useRouter } from 'next/navigation';
-import { signOut, getAuth } from 'firebase/auth';
-import { getTheme } from '@/util/theme';
 import { MutableRefObject, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useOnClickOutside } from 'use-hooks';
+import { signOut, getAuth } from 'firebase/auth';
+import Login from '../login';
+import { useIsAuthenticated } from '@/hooks/auth';
+import { getTheme } from '@/util/theme';
 
 function ProfileMenu() {
 	const router = useRouter();
-	const [open, setOpen] = useState<boolean>(false);
+	const [open, setOpen] = useState<boolean>(false); // State for menu being open
 
 	const { user, loading } = useIsAuthenticated();
+
+	/* Method for signing user out */
 	const signUserOut = () => {
 		closeMenu();
 		if (!loading) {
 			signOut(getAuth()).then(() => {
+				// Redirect to home (login) page
 				router.push('/');
 			});
 		}
@@ -24,9 +27,11 @@ function ProfileMenu() {
 
 	const ref = useRef<HTMLDivElement>(null);
 	useOnClickOutside(ref as MutableRefObject<Node>, () => setOpen(false));
+	/* Toggle menu state */
 	const toggleMenu = () => {
 		setOpen((prev) => !prev);
 	};
+	/* Close menu */
 	const closeMenu = () => {
 		setOpen(false);
 	};

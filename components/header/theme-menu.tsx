@@ -5,18 +5,23 @@ import { FaSun, FaMoon, FaPalette } from 'react-icons/fa';
 import { useOnClickOutside } from 'use-hooks';
 
 function ThemeMenu() {
-	const [theme, setTheme] = useState<'light' | 'dark' | 'mytheme'>('mytheme');
-	const [open, setOpen] = useState<boolean>(false);
+	const [theme, setTheme] = useState<'light' | 'dark' | 'mytheme'>('mytheme'); // State for current theme
+	const [open, setOpen] = useState<boolean>(false); // State for menu being open
 
 	const ref = useRef<HTMLDivElement>(null);
 	useOnClickOutside(ref as MutableRefObject<Node>, () => setOpen(false));
+
+	/* Toggles the open state of the menu */
 	const toggleMenu = () => {
 		setOpen((prev) => !prev);
 	};
+
+	/* Closes the menu on click*/
 	const closeMenu = () => {
 		setOpen(false);
 	};
 
+	/* Set the theme to light mode */
 	const toggleLightTheme = () => {
 		closeMenu();
 		document.documentElement.classList.remove('dark', 'mytheme');
@@ -25,6 +30,7 @@ function ThemeMenu() {
 		setTheme('light');
 	};
 
+	/* Set the theme to dark mode */
 	const toggleDarkTheme = () => {
 		closeMenu();
 		document.documentElement.classList.remove('light', 'mytheme');
@@ -32,6 +38,8 @@ function ThemeMenu() {
 		document.documentElement.setAttribute('data-theme', 'dark');
 		setTheme('dark');
 	};
+
+	/* Set the theme to custom app theme */
 	const toggleMyTheme = () => {
 		closeMenu();
 		document.documentElement.classList.remove('dark', 'light');

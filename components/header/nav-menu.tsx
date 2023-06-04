@@ -5,12 +5,14 @@ import { FaBars } from 'react-icons/fa';
 import { useOnClickOutside } from 'use-hooks';
 
 function NavMenu() {
-	const [open, setOpen] = useState<boolean>(false);
+	const [open, setOpen] = useState<boolean>(false); // State for menu being open
 	const ref = useRef<HTMLDivElement>(null);
 	useOnClickOutside(ref as MutableRefObject<Node>, () => setOpen(false));
+	/* Toggle menu state */
 	const toggleMenu = () => {
 		setOpen((prev) => !prev);
 	};
+	/* Close menu */
 	const closeMenu = () => {
 		setOpen(false);
 	};

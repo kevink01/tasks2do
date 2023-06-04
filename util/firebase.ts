@@ -1,13 +1,8 @@
 // Import the functions you need from the SDKs you need
-import { getApp, getApps, initializeApp } from 'firebase/app';
-import { getAnalytics } from 'firebase/analytics';
+import { getApps, initializeApp } from 'firebase/app';
 import { AuthProvider, GoogleAuthProvider, connectAuthEmulator, getAuth } from 'firebase/auth';
-import {
-	connectFirestoreEmulator,
-	enableMultiTabIndexedDbPersistence,
-	getFirestore,
-	initializeFirestore,
-} from 'firebase/firestore';
+import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
+import { getAnalytics } from 'firebase/analytics';
 import { isDev } from './environment';
 
 const firebaseConfig = {
@@ -20,8 +15,10 @@ const firebaseConfig = {
 	measurementId: `${process.env.FIREBASE_MEASUREMENT_ID!}`,
 };
 
-let app;
-
+/**
+ * Initializes the application if there isn't one available
+ * Emulators will start if we are in development mode
+ */
 export function startApp() {
 	if (getApps().length === 0) {
 		initializeApp(firebaseConfig);
@@ -37,6 +34,9 @@ export function startApp() {
 	}
 }
 
+/**
+ * Gets app analytics
+ */
 export function getAppAnalytics() {
 	if (getApps().length === 0) {
 		initializeApp(firebaseConfig);
@@ -44,4 +44,5 @@ export function getAppAnalytics() {
 	return getAnalytics();
 }
 
+/* Provider for signing in with google */
 export const googleProvider = new GoogleAuthProvider() as AuthProvider;

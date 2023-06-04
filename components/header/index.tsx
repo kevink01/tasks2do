@@ -1,6 +1,6 @@
-import ThemeMenu from './theme-menu';
-import ProfileMenu from './profile-menu';
 import NavMenu from './nav-menu';
+import ProfileMenu from './profile-menu';
+import ThemeMenu from './theme-menu';
 
 function Header() {
 	return (

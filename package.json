@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"build": "next build",
-		"dev": "concurrently --names \"Firebase,Next.js\" -c \"blue.bold,yellow.bold\" \"next dev\" \"pnpm run firebase:emulators:start\"",
+		"dev": "concurrently --names \"Next.js,Firebase\" -c \"blue.bold,yellow.bold\" \"next dev\" \"pnpm run firebase:emulators:start\"",
 		"firebase:emulators:start": "firebase emulators:start --only auth,firestore --import=./firebase --export-on-exit",
 		"lint": "next lint",
 		"prepare": "husky install",

@@ -3,9 +3,9 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signInWithPopup, getAuth, UserCredential } from 'firebase/auth';
+import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore';
 import { useIsAuthenticated } from '@/hooks/auth';
 import { googleProvider, startApp } from '@/util/firebase';
-import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore';
 
 type Props = {
 	isHeader: boolean;
@@ -19,17 +19,22 @@ function Login({ isHeader = false, text, toggleMethod }: Props) {
 	const { user, loading } = useIsAuthenticated();
 	useEffect(() => {
 		if (user && !loading) {
+			// We already have a user, redirect to the dashboard
 			router.push('/dashboard');
 		}
 	}, [user, loading, router]);
 
+	/**
+	 * Checks if user already exists in firestore
+	 * If user hasn't registered before, sign the user up
+	 * @param user User object when signing in from popup
+	 * @returns	Resolves user in db, then redirects to dashboard
+	 */
 	async function signUserIn(user: UserCredential): Promise<void> {
 		if ((await getDoc(doc(getFirestore(), `/users/${user.user.uid}`))).exists()) {
-			console.log('in here');
 			router.push('/dashboard');
 			return;
 		}
-		console.log('past here');
 		await setDoc(doc(getFirestore(), `/users/${user.user.uid}`), {
 			id: user.user.uid,
 			name: user.user.displayName,
@@ -37,14 +42,15 @@ function Login({ isHeader = false, text, toggleMethod }: Props) {
 			photoURL: user.user.photoURL,
 		})
 			.then(() => {
-				console.log('done');
 				router.push('/dashboard');
 			})
 			.catch((err) => {
 				console.log(err);
+				// TODO Popup for error
 			});
 	}
 
+	/* Method for signing in */
 	const googleSignIn = () => {
 		signInWithPopup(getAuth(), googleProvider)
 			.then(async (user) => {
