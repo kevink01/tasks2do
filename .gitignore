@@ -42,3 +42,6 @@ next-env.d.ts
 /firebase/
 fire*-debug.log
 ui-debug.log
+
+# Images
+*.png

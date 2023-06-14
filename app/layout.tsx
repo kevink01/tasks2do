@@ -1,5 +1,6 @@
 import './globals.css';
-import Header from '@/components/header';
+import Nav from '@/components/nav';
+import CustomMantineProvider from '@/components/provider';
 
 export const metadata = {
 	title: 'Create Next App',
@@ -8,10 +9,12 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
-		<html lang='en' data-theme='mytheme' className='mytheme'>
-			<body className='flex flex-col h-screen mx-auto max-w-5xl'>
-				<Header />
-				{children}
+		<html lang='en'>
+			<body className='flex flex-col h-screen mx-auto'>
+				<CustomMantineProvider>
+					<Nav />
+					{children}
+				</CustomMantineProvider>
 			</body>
 		</html>
 	);

@@ -1,16 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { getFirestore, collection, doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
-import { useIsAuthenticated } from '@/hooks/auth';
 import { v4 as uuid } from 'uuid';
+import { useIsAuthenticated } from '@/hooks/auth';
 
 type AccordionOpen = 'tasks' | 'reminders' | 'events' | 'none';
 
 function Dashboard() {
+	// TODO Redo dashboard with Mantine
 	const { user, loading, error } = useIsAuthenticated();
 	const [open, setOpen] = useState<AccordionOpen>('tasks');
+
 	const [data, dataLoading, dataError] = useCollectionData(
 		collection(getFirestore(), 'users', user?.uid ?? 'none', 'tasks')
 	);
@@ -31,7 +33,7 @@ function Dashboard() {
 			) : (
 				<>
 					{data && data.length > 0 ? (
-						<>Data!!!</>
+						<>{/* TODO: Data dispaly*/}</>
 					) : (
 						<div className='flex flex-col space-y-4'>
 							<span>Sad</span>

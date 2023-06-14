@@ -1,8 +1,15 @@
-// Import the functions you need from the SDKs you need
-import { getApps, initializeApp } from 'firebase/app';
-import { AuthProvider, GoogleAuthProvider, connectAuthEmulator, getAuth } from 'firebase/auth';
-import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
+import { useRouter } from 'next/navigation';
 import { getAnalytics } from 'firebase/analytics';
+import { getApps, initializeApp } from 'firebase/app';
+import {
+	AuthProvider,
+	GoogleAuthProvider,
+	UserCredential,
+	connectAuthEmulator,
+	getAuth,
+	signInWithPopup,
+} from 'firebase/auth';
+import { connectFirestoreEmulator, doc, getDoc, getFirestore, setDoc } from 'firebase/firestore';
 import { isDev } from './environment';
 
 const firebaseConfig = {
@@ -46,3 +53,32 @@ export function getAppAnalytics() {
 
 /* Provider for signing in with google */
 export const googleProvider = new GoogleAuthProvider() as AuthProvider;
+
+/**
+ * Method for signing user in
+ * Will add user to database and redirect to dashboard
+ */
+export const googleSignIn = () => {
+	signInWithPopup(getAuth(), googleProvider)
+		.then(async (user: UserCredential) => {
+			const router = useRouter();
+			if ((await getDoc(doc(getFirestore(), `/users/${user.user.uid}`))).exists()) {
+				router.push('/dashboard');
+				return;
+			}
+			await setDoc(doc(getFirestore(), `/users/${user.user.uid}`), {
+				id: user.user.uid,
+				name: user.user.displayName,
+				email: user.user.email,
+				photoURL: user.user.photoURL,
+			})
+				.then(() => {
+					router.push('/dashboard');
+				})
+				.catch((err) => {
+					console.log(err);
+					// TODO Popup for error
+				});
+		})
+		.catch(() => {});
+};
