@@ -1,5 +1,3 @@
-'use client';
-
 import { startApp } from '@/util/firebase';
 import { getAuth } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
@@ -23,6 +21,7 @@ export function useIsAuthenticated() {
 export function useProtectedRoute() {
 	const router = useRouter();
 	const { user, loading, error } = useIsAuthenticated();
+
 	return useEffect(() => {
 		if (!user && (!loading || error)) {
 			router.push('/');

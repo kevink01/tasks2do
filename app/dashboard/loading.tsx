@@ -1,7 +1,9 @@
-import React from 'react';
-
-function Loading() {
+function DashboardLoader() {
 	return <div>Loading</div>;
 }
 
-export default Loading;
+export default DashboardLoader;
+
+export function TaskLoader() {
+	return <div>Task loader</div>;
+}

@@ -1,5 +1,5 @@
 import './globals.css';
-import Nav from '@/components/nav';
+import Navigation from '@/components/navigation';
 import CustomMantineProvider from '@/components/provider';
 
 export const metadata = {
@@ -12,7 +12,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 		<html lang='en'>
 			<body className='flex flex-col h-screen mx-auto'>
 				<CustomMantineProvider>
-					<Nav />
+					{/* <Nav /> */}
+					<Navigation />
 					{children}
 				</CustomMantineProvider>
 			</body>

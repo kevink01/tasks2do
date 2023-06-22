@@ -1,7 +1,7 @@
 'use client';
 
 import { ActionIcon, Button, Menu, useMantineColorScheme } from '@mantine/core';
-import { FaSun, FaMoon } from 'react-icons/fa';
+import { FaMoon, FaSun } from 'react-icons/fa';
 
 function ThemeMenu() {
 	const { colorScheme, toggleColorScheme } = useMantineColorScheme();

@@ -1,8 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { signOut, getAuth } from 'firebase/auth';
 import { Avatar, Divider, Menu } from '@mantine/core';
+import { getAuth, signOut } from 'firebase/auth';
 import { FaUser } from 'react-icons/fa';
 import { FiSettings } from 'react-icons/fi';
 import { useIsAuthenticated } from '@/hooks/auth';

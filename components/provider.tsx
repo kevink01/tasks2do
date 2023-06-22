@@ -1,9 +1,9 @@
 'use client';
 
 import { CacheProvider } from '@emotion/react';
-import { ColorScheme, ColorSchemeProvider, MantineProvider, useEmotionCache, useMantineTheme } from '@mantine/core';
-import { useServerInsertedHTML } from 'next/navigation';
 import { useState } from 'react';
+import { useServerInsertedHTML } from 'next/navigation';
+import { ColorScheme, ColorSchemeProvider, MantineProvider, useEmotionCache, useMantineTheme } from '@mantine/core';
 
 function CustomMantineProvider({ children }: { children: React.ReactNode }) {
 	const cache = useEmotionCache();
