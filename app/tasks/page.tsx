@@ -7,6 +7,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { FaExclamation, FaPen, FaTrash } from 'react-icons/fa';
 import { useProtectedRoute } from '@/hooks/auth';
 import { useTasks } from '@/hooks/types';
+import { Task } from '@/types/tasks';
 
 function Tasks() {
 	useProtectedRoute();
@@ -56,7 +57,6 @@ function Tasks() {
 					<Container>
 						<Grid gutter={5}>
 							{tasks.map((task) => {
-								console.log(task.timestamp);
 								return (
 									<Grid.Col span={4} key={task.id}>
 										<Card shadow='sm' padding='sm' radius='md' withBorder>
@@ -79,9 +79,9 @@ function Tasks() {
 											<Card.Section ml={rem(4)} pb={rem(4)}>
 												<Text fz='sm' display='flex' sx={{ gap: rem(4) }}>
 													<Text fs='italic'>Created on:</Text>
-													{new Date(
+													{/* {new Date(
 														task.timestamp.seconds * 1000 + task.timestamp.nanoseconds / 1000000 // Converts to milliseconds
-													).toLocaleDateString()}
+													).toLocaleDateString()} */}
 												</Text>
 											</Card.Section>
 										</Card>

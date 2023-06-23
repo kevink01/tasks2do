@@ -5,6 +5,9 @@ import { useState } from 'react';
 import { useServerInsertedHTML } from 'next/navigation';
 import { ColorScheme, ColorSchemeProvider, MantineProvider, useEmotionCache, useMantineTheme } from '@mantine/core';
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 function CustomMantineProvider({ children }: { children: React.ReactNode }) {
 	const cache = useEmotionCache();
 	cache.compat = true;
@@ -33,6 +36,18 @@ function CustomMantineProvider({ children }: { children: React.ReactNode }) {
 							backgroundColor: colorScheme === 'dark' ? theme.colors.dark[7] : theme.white,
 							color: colorScheme === 'dark' ? theme.white : theme.colors.gray[7],
 						}}>
+						<ToastContainer
+							position='top-right'
+							autoClose={5000}
+							hideProgressBar={false}
+							newestOnTop={false}
+							closeOnClick
+							rtl={false}
+							pauseOnFocusLoss
+							draggable
+							pauseOnHover
+							theme='dark'
+						/>
 						{children}
 					</div>
 				</MantineProvider>

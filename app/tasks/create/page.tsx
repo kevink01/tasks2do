@@ -4,13 +4,11 @@ import { useState } from 'react';
 import { Button, Container, TextInput, Textarea } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { useForm } from 'react-hook-form';
+import { TaskForm, taskFormSchema } from '@/types/tasks';
+import { parse } from '@/types/error';
+import { ToastContainer, toast } from 'react-toastify';
+import { useTasks } from '@/hooks/types';
 // import { test } from '@/util/types/index';
-
-type Test = {
-	name: string;
-	description: string;
-	complete: Date;
-};
 
 function TaskCreate() {
 	const [date, setDate] = useState<Date | null>();
@@ -19,11 +17,23 @@ function TaskCreate() {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm<Test>();
+	} = useForm<TaskForm>();
+
+	const { createTask } = useTasks();
 
 	const submission = () => {
 		register('complete', { value: new Date(date as Date) });
-		console.log(getValues());
+		const result = parse<TaskForm>(taskFormSchema, getValues());
+		if (result.success) {
+			const firebaseResult = createTask(result.data);
+			if (firebaseResult.success) {
+				toast(`Successfully created task name ${firebaseResult.data.name}`, { type: 'success' });
+			} else {
+				toast('Unable to create task', { type: 'error' });
+			}
+		} else {
+			toast('It was error :(');
+		}
 	};
 
 	return (
@@ -54,20 +64,16 @@ function TaskCreate() {
 					{...register('description')}
 				/>
 				<DateTimePicker
+					valueFormat='MM/DD/YYYY hh:mm A'
 					label='Completion date'
 					placeholder='Pick date and time'
 					minDate={new Date()}
 					firstDayOfWeek={0}
 					onChange={(e) => {
-						console.log(e);
 						setDate(e);
 					}}
 				/>
 				<Button type='submit'>Click me</Button>
-				{/* <Button onClick={() => test({ name: 'abcdefg', description: '123456', complete: new Date(432849083849032) })}>
-					{' '}
-					Click me again!
-				</Button> */}
 			</form>
 		</Container>
 	);
