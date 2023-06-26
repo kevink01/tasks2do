@@ -16,3 +16,12 @@ export const taskSchema = taskFormSchema.merge(
 );
 
 export type Task = z.infer<typeof taskSchema>;
+
+export const taskFetchSchema = taskSchema.merge(
+	z.object({
+		complete: z.object({ seconds: z.number(), nanoseconds: z.number() }),
+		created: z.object({ seconds: z.number(), nanoseconds: z.number() }),
+	})
+);
+
+export type TaskFetch = z.infer<typeof taskFetchSchema>;

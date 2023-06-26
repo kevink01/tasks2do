@@ -45,3 +45,6 @@ ui-debug.log
 
 # Images
 *.png
+
+# Development
+dev/

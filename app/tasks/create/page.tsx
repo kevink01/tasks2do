@@ -32,7 +32,7 @@ function TaskCreate() {
 				toast('Unable to create task', { type: 'error' });
 			}
 		} else {
-			toast('It was error :(');
+			toast('Parsed error', { type: 'error' });
 		}
 	};
 
