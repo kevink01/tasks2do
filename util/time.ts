@@ -37,6 +37,19 @@ export function convertToTimestamp(timestamp: FirebaseTimestamp): string {
 }
 
 /**
+ * Returns the color associated with the severity
+ * @param days Days Remaining object that contains the severity
+ * @returns Red (error), orange (danger), yellow (warn), green (good), or white (unknown)
+ */
+export function getColor(days: DayJSRemaining | null): 'red' | 'orange' | 'yellow' | 'green' | 'white' {
+	if (!days) return 'white';
+	if (days.severity === 'error') return 'red';
+	if (days.severity === 'danger') return 'orange';
+	if (days.severity === 'warn') return 'yellow';
+	return 'green';
+}
+
+/**
  * Returns a formatted string that notes how much time to a given date
  * @param timestamp The firebase timestamp (includes seconds & nanoseconds)
  * @returns Object containing: past the date, value & unit of measurement, message, and "severity" (how close/past is the date)

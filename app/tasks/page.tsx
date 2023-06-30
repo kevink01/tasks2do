@@ -6,9 +6,11 @@ import { Accordion, Alert, Box, Button, Card, Container, Divider, Grid, Modal, T
 import { useDisclosure } from '@mantine/hooks';
 import { FaExclamation, FaPen, FaTrash } from 'react-icons/fa';
 import { useProtectedRoute } from '@/hooks/auth';
-import { useTasks } from '@/hooks/types';
+import { useTasks } from '@/hooks/use-tasks';
 import { TaskFetch } from '@/types/tasks';
-import { convertToTimestamp, daysRemaining } from '@/util/time';
+import { convertToTimestamp, daysRemaining, getColor } from '@/util/time';
+import { toast } from 'react-toastify';
+import CustomLink from '@/components/customLink';
 
 function Tasks() {
 	useProtectedRoute();
@@ -17,7 +19,7 @@ function Tasks() {
 	const [selectedTask, setSelectedTask] = useState<TaskFetch | null>(null);
 
 	const [opened, { open, close }] = useDisclosure();
-	const { tasks, createTask, updateTask, deleteTask } = useTasks();
+	const { tasks, deleteTask } = useTasks();
 
 	const promptDeleteTask = (task: TaskFetch) => {
 		open();
@@ -25,7 +27,12 @@ function Tasks() {
 	};
 
 	const deleteSelectedTask = () => {
-		deleteTask(selectedTask as TaskFetch);
+		const firebaseResult = deleteTask(selectedTask as TaskFetch);
+		if (firebaseResult.success) {
+			toast(`Successfully deleted this task`, { type: 'success' });
+		} else {
+			toast('Unable to delete task', { type: 'error' });
+		}
 		closeModal();
 	};
 
@@ -70,23 +77,16 @@ function Tasks() {
 											<Text size='md'>
 												<Text fs='italic'>Complete on:</Text>
 												{convertToTimestamp(task.complete)}
-												<Text
-													color={`${
-														date.severity === 'error'
-															? 'red'
-															: date.severity === 'danger'
-															? 'orange'
-															: date.severity === 'warn'
-															? 'yellow'
-															: 'green'
-													}`}>{`(${date.message})`}</Text>
+												<Text color={getColor(date)}>{`(${date.message})`}</Text>
 											</Text>
 										</Card.Section>
 										<Card.Section ml={rem(4)} mt={rem(4)} mb={rem(4)}>
 											<Box sx={{ display: 'flex', gap: rem(4) }}>
-												<Button color='orange' leftIcon={<FaPen />}>
-													Update task
-												</Button>
+												<CustomLink href={`/tasks/${task.id}`}>
+													<Button color='orange' leftIcon={<FaPen />}>
+														Update task
+													</Button>
+												</CustomLink>
 												<Button color='red' leftIcon={<FaTrash />} onClick={() => promptDeleteTask(task)}>
 													Delete task
 												</Button>
@@ -96,6 +96,10 @@ function Tasks() {
 											<Text fz='sm' display='flex' sx={{ gap: rem(4) }}>
 												<Text fs='italic'>Created on:</Text>
 												{convertToTimestamp(task.created)}
+											</Text>
+											<Text fz='sm' display='flex' sx={{ gap: rem(4) }}>
+												<Text fs='italic'>Last updated:</Text>
+												{convertToTimestamp(task.updated)}
 											</Text>
 										</Card.Section>
 									</Card>

@@ -12,6 +12,7 @@ export const taskSchema = taskFormSchema.merge(
 	z.object({
 		id: z.string().uuid({ message: 'Not a valid UUID' }),
 		created: z.date(),
+		updated: z.date(),
 	})
 );
 
@@ -21,6 +22,7 @@ export const taskFetchSchema = taskSchema.merge(
 	z.object({
 		complete: z.object({ seconds: z.number(), nanoseconds: z.number() }),
 		created: z.object({ seconds: z.number(), nanoseconds: z.number() }),
+		updated: z.object({ seconds: z.number(), nanoseconds: z.number() }),
 	})
 );
 

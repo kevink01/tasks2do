@@ -1,16 +1,16 @@
-import { collection, deleteDoc, doc, getFirestore, serverTimestamp, setDoc } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getFirestore, setDoc } from 'firebase/firestore';
 import { v4 as uuid } from 'uuid';
 import { useIsAuthenticated } from './auth';
 import { useUserCollection } from './firestore';
-import { Task, TaskFetch, TaskForm, taskSchema } from '@/types/tasks';
-import { parse } from '@/types/error';
+import { Task, TaskFetch, TaskForm, taskFetchSchema, taskSchema } from '@/types/tasks';
+import { parse } from '@/types/parse';
 import { FirebaseResult } from '@/types/firebase';
 
 type TasksInstance = {
 	tasks: TaskFetch[] | null;
 	createTask: (task: TaskForm) => FirebaseResult<Task>;
 	updateTask: (task: Task) => void;
-	deleteTask: (task: TaskFetch) => void;
+	deleteTask: (task: TaskFetch) => FirebaseResult<undefined>;
 };
 
 export function useTasks(): TasksInstance {
@@ -23,8 +23,7 @@ export function useTasks(): TasksInstance {
 		if (user) {
 			const id = uuid();
 			const now = new Date();
-			const date = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
-			const parsed = parse<Task>(taskSchema, { ...task, id: id, created: now });
+			const parsed = parse<Task>(taskSchema, { ...task, id: id, created: now, updated: now });
 			if (parsed.success) {
 				setDoc(doc(getFirestore(), `/users/${user.uid}/tasks/${parsed.data.id}`), parsed.data);
 				return { success: true, data: parsed.data };
@@ -41,10 +40,17 @@ export function useTasks(): TasksInstance {
 		}
 	}
 
-	function deleteTask(task: TaskFetch) {
+	function deleteTask(task: TaskFetch): FirebaseResult<undefined> {
 		if (user) {
-			deleteDoc(doc(getFirestore(), `/users/${user.uid}/tasks/${task.id}`));
+			const result = parse<TaskFetch>(taskFetchSchema, task);
+			if (result.success) {
+				deleteDoc(doc(getFirestore(), `/users/${user.uid}/tasks/${result.data.id}`));
+				return { success: true, data: undefined };
+			} else {
+				return { success: false, error: 'Parsed data was not successful' };
+			}
 		}
+		return { success: false, error: 'User not logged in' };
 	}
 
 	return { tasks, createTask, updateTask, deleteTask };
