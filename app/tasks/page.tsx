@@ -10,7 +10,9 @@ import { useTasks } from '@/hooks/use-tasks';
 import { TaskFetch } from '@/types/tasks';
 import { convertToTimestamp, daysRemaining, getColor } from '@/util/time';
 import { toast } from 'react-toastify';
-import CustomLink from '@/components/customLink';
+import CustomLink from '@/components/custom-link';
+import { TasksGridLoader } from './loading';
+import NoTasks from '@/components/tasks/no-tasks';
 
 function Tasks() {
 	useProtectedRoute();
@@ -56,18 +58,30 @@ function Tasks() {
 					<Accordion.Item value='tasks'>
 						<Box sx={{ display: 'flex', alignItems: 'center', gap: rem(10) }}>
 							<Accordion.Control>Tasks</Accordion.Control>
-							<Button onClick={() => router.push('/tasks/create')}>Create Task</Button>
+							<CustomLink href='/tasks/create'>
+								<Button color='orange'>Create task</Button>
+							</CustomLink>
 						</Box>
 						<Accordion.Panel>Description</Accordion.Panel>
 					</Accordion.Item>
 				</Accordion>
-				{tasks?.length && (
+				{!tasks ? (
+					<TasksGridLoader />
+				) : tasks.length === 0 ? (
+					<NoTasks />
+				) : (
 					<Grid gutter={5}>
 						{tasks.map((task) => {
 							const date = daysRemaining(task.complete);
 							return (
 								<Grid.Col span={4} key={task.id}>
-									<Card shadow='sm' padding='sm' radius='md' withBorder>
+									<Card
+										shadow='sm'
+										padding='sm'
+										radius='md'
+										withBorder
+										onClick={() => router.push(`/tasks/${task.id}`)}
+										className='hover:cursor-pointer'>
 										<Card.Section ml={rem(4)}>
 											<Text size='xl'>{task.name}</Text>
 											<Text fs='italic' lineClamp={1}>

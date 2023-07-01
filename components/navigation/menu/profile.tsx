@@ -39,8 +39,16 @@ function ProfileMenu() {
 					Settings
 				</Menu.Item>
 				<Divider />
-				{!user && !loading && <Menu.Item onClick={googleSignIn}>Sign In</Menu.Item>}
-				{user && !loading && <Menu.Item onClick={signUserOut}>Sign Out</Menu.Item>}
+				{!user && !loading && (
+					<Menu.Item key='menu-profile-signin' onClick={googleSignIn}>
+						Sign In
+					</Menu.Item>
+				)}
+				{user && !loading && (
+					<Menu.Item key='menu-profile-signout' onClick={signUserOut}>
+						Sign Out
+					</Menu.Item>
+				)}
 			</Menu.Dropdown>
 		</Menu>
 	);

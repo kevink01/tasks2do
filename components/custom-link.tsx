@@ -12,7 +12,7 @@ function CustomLink({ children, href }: { children: React.ReactNode; href: strin
 		};
 	}, []);
 	return (
-		<Link href={href} onClick={() => nprogress.start()}>
+		<Link href={href} onClick={() => nprogress.start()} className='no-underline text-white'>
 			{children}
 		</Link>
 	);
