@@ -15,16 +15,22 @@ function TaskCreate() {
 
 	const [date, setDate] = useState<Date | null>();
 	const {
+		clearErrors,
 		getValues,
-		register,
 		handleSubmit,
+		register,
+		setError,
 		formState: { errors },
 	} = useForm<TaskForm>();
 
 	const { createTask } = useTasks();
 
 	const submission = () => {
-		register('complete', { value: new Date(date as Date) });
+		if (!date) {
+			setError('complete', { message: 'Please enter a date', type: 'required' });
+			return;
+		}
+		register('complete', { value: date });
 		const result = parse<TaskForm>(taskFormSchema, getValues());
 		if (result.success) {
 			const firebaseResult = createTask(result.data);
@@ -53,7 +59,7 @@ function TaskCreate() {
 						{...register('name', {
 							minLength: {
 								value: 5,
-								message: 'Testing',
+								message: 'Minimum length is 5',
 							},
 						})}
 					/>
@@ -68,17 +74,19 @@ function TaskCreate() {
 						{...register('description')}
 					/>
 					<DateTimePicker
+						withAsterisk
 						label='Completion date'
 						placeholder='Pick date and time'
-						withAsterisk
+						valueFormat='MM/DD/YYYY hh:mm A'
 						dropdownType='modal'
 						modalProps={{ centered: true }}
-						valueFormat='MM/DD/YYYY hh:mm A'
 						minDate={new Date()}
 						firstDayOfWeek={0}
 						onChange={(e) => {
 							setDate(e);
+							clearErrors('complete');
 						}}
+						error={errors.complete?.message}
 					/>
 				</Stack>
 				<Center mt={rem(10)}>

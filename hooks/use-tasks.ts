@@ -5,11 +5,12 @@ import { useUserCollection } from './firestore';
 import { Task, TaskFetch, TaskForm, taskFetchSchema, taskSchema } from '@/types/tasks';
 import { parse } from '@/types/parse';
 import { FirebaseResult } from '@/types/firebase';
+import { getDate } from '@/util/time';
 
 type TasksInstance = {
 	tasks: TaskFetch[] | null;
 	createTask: (task: TaskForm) => FirebaseResult<Task>;
-	updateTask: (task: Task) => void;
+	updateTask: (oldTask: TaskFetch, taskForm: TaskForm) => FirebaseResult<Task>;
 	deleteTask: (task: TaskFetch) => FirebaseResult<undefined>;
 };
 
@@ -34,10 +35,23 @@ export function useTasks(): TasksInstance {
 		return { success: false, error: 'User not logged in' };
 	}
 
-	function updateTask(task: Task) {
+	function updateTask(oldTask: TaskFetch, taskForm: TaskForm): FirebaseResult<Task> {
 		if (user) {
-			setDoc(doc(getFirestore(), `/users/${user.uid}/tasks/${task.id}`), task);
+			const now = new Date();
+			const parsed = parse<Task>(taskSchema, {
+				...oldTask,
+				...taskForm,
+				created: getDate(oldTask.created),
+				updated: now,
+			});
+			if (parsed.success) {
+				setDoc(doc(getFirestore(), `/users/${user.uid}/tasks/${oldTask.id}`), parsed.data);
+				return { success: true, data: parsed.data };
+			} else {
+				return { success: false, error: 'Parsed data was not successful' };
+			}
 		}
+		return { success: false, error: 'User not logged in' };
 	}
 
 	function deleteTask(task: TaskFetch): FirebaseResult<undefined> {
