@@ -31,14 +31,12 @@ import TaskLoadError from './error';
 
 type Props = {
 	edit?: boolean;
-	age?: number;
 };
 
 type RequiredProps = Required<Props>;
 
 const defaultProps: RequiredProps = {
 	edit: false,
-	age: 5,
 };
 
 function TaskIDPage({ params, propsIn }: { params: { id: string }; propsIn: Props }) {
