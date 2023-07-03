@@ -25,15 +25,26 @@ export function getDate(timestamp: FirebaseTimestamp): Date {
 }
 
 /**
+ * Returns the time relative to the user's timezone
+ * @param date Date object
+ * @returns Formatted date (including timezone)
+ */
+export function getTime(date: Date): string {
+	return moment(date).tz(Intl.DateTimeFormat().resolvedOptions().timeZone).format('h:mm A z');
+}
+/**
  * Converts the timestamp into a timezone-friendly string
  * @param timestamp The firebase timestamp (includes seconds & nanoseconds)
  * @returns Date & time (M/D/yyyy hh:mm a tz format)
  */
 export function convertToTimestamp(timestamp: FirebaseTimestamp): string {
 	const date = getDate(timestamp);
-	const ts = moment(date);
-	const timezone = ts.tz(Intl.DateTimeFormat().resolvedOptions().timeZone).format('h:mm A z');
-	return `${date.toLocaleDateString()} ${timezone}`;
+	return `${date.toLocaleDateString()} ${getTime(date)}`;
+}
+
+export function getBeginningOfDay(timestamp: FirebaseTimestamp): Date {
+	const date = getDate(timestamp);
+	return moment(date).startOf('day').toDate();
 }
 
 /**
@@ -71,7 +82,6 @@ export function daysRemaining(timestamp: FirebaseTimestamp) {
 	};
 
 	switch (true) {
-		// TODO REDO
 		case absDiff < MINUTES: {
 			const units = dayJSDate.diff(undefined, 'minutes', true);
 			returnValues.value = units;

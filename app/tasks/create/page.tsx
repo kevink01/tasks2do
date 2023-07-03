@@ -1,16 +1,19 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button, Center, Container, Stack, TextInput, Textarea, rem } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
+import { useProtectedRoute } from '@/hooks/auth';
 import { useTasks } from '@/hooks/use-tasks';
 import { TaskForm, taskFormSchema } from '@/types/tasks';
 import { parse } from '@/types/parse';
-import { useRouter } from 'next/navigation';
 
 function TaskCreate() {
+	useProtectedRoute();
+
 	const router = useRouter();
 
 	const [date, setDate] = useState<Date | null>();

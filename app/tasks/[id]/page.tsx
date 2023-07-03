@@ -23,6 +23,7 @@ import { modals } from '@mantine/modals';
 import { toast } from 'react-toastify';
 import { FaExclamation, FaQuestionCircle } from 'react-icons/fa';
 
+import { useProtectedRoute } from '@/hooks/auth';
 import { useUserDocument } from '@/hooks/firestore';
 import { useTasks } from '@/hooks/use-tasks';
 import { TaskFetch, TaskForm } from '@/types/tasks';
@@ -40,6 +41,8 @@ const defaultProps: RequiredProps = {
 };
 
 function TaskIDPage({ params, propsIn }: { params: { id: string }; propsIn: Props }) {
+	useProtectedRoute();
+
 	const task = useUserDocument<TaskFetch>((user) => doc(getFirestore(), `/users/${user.uid}/tasks/${params.id}`));
 	const { updateTask, deleteTask } = useTasks();
 	const days = task[0] ? daysRemaining(task[0].complete) : null;
@@ -141,7 +144,7 @@ function TaskIDPage({ params, propsIn }: { params: { id: string }; propsIn: Prop
 				</Container>
 			),
 			labels: { confirm: 'Confirm', cancel: 'Cancel' },
-			confirmProps: { color: 'green', disabled: !task[0] },
+			confirmProps: { color: 'red', disabled: !task[0] },
 			onConfirm: () => {
 				if (!task[0]) {
 					toast('Task is null', { type: 'error' });

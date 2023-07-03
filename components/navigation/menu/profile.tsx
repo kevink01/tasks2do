@@ -38,7 +38,7 @@ function ProfileMenu() {
 				<Menu.Item key='menu-settings-choice' component='a' href='/settings' icon={<FiSettings />}>
 					Settings
 				</Menu.Item>
-				<Divider />
+				<Divider key={'menu-divider'} />
 				{!user && !loading && (
 					<Menu.Item key='menu-profile-signin' onClick={googleSignIn}>
 						Sign In

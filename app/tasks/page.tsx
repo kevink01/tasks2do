@@ -1,129 +1,172 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Accordion, Alert, Box, Button, Card, Container, Divider, Grid, Modal, Text, rem } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import { FaExclamation, FaPen, FaTrash } from 'react-icons/fa';
+import {
+	Accordion,
+	ActionIcon,
+	Box,
+	Button,
+	Center,
+	Container,
+	Grid,
+	Group,
+	Indicator,
+	Stack,
+	Text,
+	Tooltip,
+	Transition,
+	rem,
+} from '@mantine/core';
+import { FaCalendar, FaTable } from 'react-icons/fa';
 import { useProtectedRoute } from '@/hooks/auth';
 import { useTasks } from '@/hooks/use-tasks';
 import { TaskFetch } from '@/types/tasks';
-import { convertToTimestamp, daysRemaining, getColor } from '@/util/time';
-import { toast } from 'react-toastify';
+import { getBeginningOfDay } from '@/util/time';
 import CustomLink from '@/components/custom-link';
 import { TasksGridLoader } from './loading';
 import NoTasks from '@/components/tasks/no-tasks';
+import { Calendar } from '@mantine/dates';
+import TaskInfo from '@/components/tasks/task-info';
+import TaskCard from '@/components/tasks/task-card';
+
+type SelectedDate = {
+	date: Date | null;
+	tasks: TaskFetch[];
+};
+
+const opacity = {
+	in: { opacity: 1, transform: 'scaleX(1)' },
+	out: { opacity: 0, transform: 'scaleX(0)' },
+	common: { transformOrigin: 'left' },
+	transitionProperty: 'transform, opacity',
+};
 
 function Tasks() {
 	useProtectedRoute();
+	const { tasks } = useTasks();
 	const router = useRouter();
 
-	const [selectedTask, setSelectedTask] = useState<TaskFetch | null>(null);
+	const [calendarMode, setCalenderMode] = useState<boolean>(false);
+	const [days, setDays] = useState<number[]>([]);
+	const [selectedDate, setSelectedDate] = useState<SelectedDate>({ date: null, tasks: [] });
 
-	const [opened, { open, close }] = useDisclosure();
-	const { tasks, deleteTask } = useTasks();
-
-	const promptDeleteTask = (task: TaskFetch) => {
-		open();
-		setSelectedTask(task);
+	const toggleCalendarMode = () => {
+		setCalenderMode((mode) => !mode);
 	};
 
-	const deleteSelectedTask = () => {
-		const firebaseResult = deleteTask(selectedTask as TaskFetch);
-		if (firebaseResult.success) {
-			toast(`Successfully deleted this task`, { type: 'success' });
+	const handleSelectDate = (date: Date) => {
+		if (selectedDate.date && selectedDate.date.valueOf() === date.valueOf()) {
+			setSelectedDate({ date: null, tasks: [] });
 		} else {
-			toast('Unable to delete task', { type: 'error' });
+			if (tasks) {
+				const dateTasks = tasks.filter((task) => getBeginningOfDay(task.complete).valueOf() === date.valueOf());
+				setSelectedDate({ ...selectedDate, date: null });
+				setTimeout(() => {
+					setSelectedDate({ date: date, tasks: dateTasks });
+				}, 200);
+			} else {
+				setSelectedDate({ date: date, tasks: [] });
+			}
 		}
-		closeModal();
 	};
 
-	const closeModal = () => {
-		setSelectedTask(null);
-		close();
-	};
+	useEffect(() => {
+		if (!tasks) return;
+		setDays(
+			tasks.map((task) => {
+				return getBeginningOfDay(task.complete).valueOf();
+			})
+		);
+	}, [tasks]);
 
 	return (
-		<>
-			<Modal centered opened={opened} onClose={close}>
-				<Alert icon={<FaExclamation />} title='Are you sure you want to delete?' color='red' radius='xs' mb={rem(4)}>
-					This action cannot be undone
-				</Alert>
-				<Button color='red' onClick={deleteSelectedTask}>
-					Delete task
-				</Button>
-			</Modal>
-			<Container size='lg' px='xs'>
-				<Accordion defaultValue='tasks' pb={rem(10)}>
-					<Accordion.Item value='tasks'>
-						<Box sx={{ display: 'flex', alignItems: 'center', gap: rem(10) }}>
-							<Accordion.Control>Tasks</Accordion.Control>
-							<CustomLink href='/tasks/create'>
-								<Button color='orange'>Create task</Button>
-							</CustomLink>
-						</Box>
-						<Accordion.Panel>Description</Accordion.Panel>
-					</Accordion.Item>
-				</Accordion>
-				{!tasks ? (
-					<TasksGridLoader />
-				) : tasks.length === 0 ? (
-					<NoTasks />
-				) : (
-					<Grid gutter={5}>
-						{tasks.map((task) => {
-							const date = daysRemaining(task.complete);
-							return (
-								<Grid.Col span={4} key={task.id}>
-									<Card
-										shadow='sm'
-										padding='sm'
-										radius='md'
-										withBorder
-										onClick={() => router.push(`/tasks/${task.id}`)}
-										className='hover:cursor-pointer'>
-										<Card.Section ml={rem(4)}>
-											<Text size='xl'>{task.name}</Text>
-											<Text fs='italic' lineClamp={1}>
-												{task.description}
-											</Text>
-											<Divider />
-											<Text size='md'>
-												<Text fs='italic'>Complete on:</Text>
-												{convertToTimestamp(task.complete)}
-												<Text color={getColor(date)}>{`(${date.message})`}</Text>
-											</Text>
-										</Card.Section>
-										<Card.Section ml={rem(4)} mt={rem(4)} mb={rem(4)}>
-											<Box sx={{ display: 'flex', gap: rem(4) }}>
-												<CustomLink href={`/tasks/${task.id}`}>
-													<Button color='orange' leftIcon={<FaPen />}>
-														Update task
-													</Button>
-												</CustomLink>
-												<Button color='red' leftIcon={<FaTrash />} onClick={() => promptDeleteTask(task)}>
-													Delete task
-												</Button>
-											</Box>
-										</Card.Section>
-										<Card.Section ml={rem(4)} pb={rem(4)}>
-											<Text fz='sm' display='flex' sx={{ gap: rem(4) }}>
-												<Text fs='italic'>Created on:</Text>
-												{convertToTimestamp(task.created)}
-											</Text>
-											<Text fz='sm' display='flex' sx={{ gap: rem(4) }}>
-												<Text fs='italic'>Last updated:</Text>
-												{convertToTimestamp(task.updated)}
-											</Text>
-										</Card.Section>
-									</Card>
-								</Grid.Col>
-							);
-						})}
-					</Grid>
-				)}
-			</Container>
-		</>
+		<Container size='lg' px='xs'>
+			<Accordion defaultValue='tasks' pb={rem(10)}>
+				<Accordion.Item value='tasks'>
+					<Box sx={{ display: 'flex', alignItems: 'center', gap: rem(10) }}>
+						<Accordion.Control>Tasks</Accordion.Control>
+						<CustomLink href='/tasks/create'>
+							<Button color='orange'>Create task</Button>
+						</CustomLink>
+						<Tooltip
+							label={calendarMode ? 'Table mode' : 'Calendar mode'}
+							color='orange'
+							position='bottom'
+							withArrow
+							arrowPosition='center'
+							events={{ hover: true, focus: true, touch: false }}>
+							<ActionIcon color='orange' size='xl' radius='xl' variant='light' onClick={toggleCalendarMode}>
+								{calendarMode ? <FaTable /> : <FaCalendar />}
+							</ActionIcon>
+						</Tooltip>
+					</Box>
+					<Accordion.Panel>Description</Accordion.Panel>
+				</Accordion.Item>
+			</Accordion>
+			{!tasks ? (
+				<TasksGridLoader />
+			) : tasks.length === 0 ? (
+				<NoTasks />
+			) : calendarMode ? (
+				<Container size='sm' px='xs'>
+					<Stack>
+						<Center>
+							<Calendar
+								size='md'
+								renderDay={(date) => {
+									return (
+										<Indicator color='red' offset={-2} disabled={!days.includes(date.valueOf())}>
+											<div>{date.getDate()}</div>
+										</Indicator>
+									);
+								}}
+								getDayProps={(date) => ({
+									onClick: () => handleSelectDate(date),
+								})}
+							/>
+						</Center>
+						<Accordion value={selectedDate.date && 'tasks'}>
+							<Accordion.Item value='tasks'>
+								<Accordion.Control disabled={!selectedDate.date}>
+									<Group>
+										<Text>Tasks for date:</Text>
+										<Transition
+											mounted={selectedDate.date !== null}
+											transition={opacity}
+											duration={200}
+											timingFunction='ease'>
+											{(styles) => (
+												<Text style={styles}>
+													{selectedDate.date ? ` ${selectedDate.date.toLocaleDateString()}` : ''}
+												</Text>
+											)}
+										</Transition>
+									</Group>
+								</Accordion.Control>
+								<Accordion.Panel>
+									{selectedDate.tasks.length === 0 ? (
+										<div>No tasks</div>
+									) : (
+										<Stack spacing='xs' align='left'>
+											{selectedDate.tasks.map((task) => {
+												return <TaskInfo task={task} key={task.id} />;
+											})}
+										</Stack>
+									)}
+								</Accordion.Panel>
+							</Accordion.Item>
+						</Accordion>
+					</Stack>
+				</Container>
+			) : (
+				<Grid gutter={5}>
+					{tasks.map((task) => {
+						return <TaskCard key={task.id} task={task} router={router} />;
+					})}
+				</Grid>
+			)}
+		</Container>
 	);
 }
 
