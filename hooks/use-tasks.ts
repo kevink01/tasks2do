@@ -56,9 +56,9 @@ export function useTasks(): TasksInstance {
 
 	function deleteTask(task: TaskFetch): FirebaseResult<undefined> {
 		if (user) {
-			const result = parse<TaskFetch>(taskFetchSchema, task);
-			if (result.success) {
-				deleteDoc(doc(getFirestore(), `/users/${user.uid}/tasks/${result.data.id}`));
+			const parsed = parse<TaskFetch>(taskFetchSchema, task);
+			if (parsed.success) {
+				deleteDoc(doc(getFirestore(), `/users/${user.uid}/tasks/${parsed.data.id}`));
 				return { success: true, data: undefined };
 			} else {
 				return { success: false, error: 'Parsed data was not successful' };

@@ -3,10 +3,10 @@ import { TaskFetch } from '@/types/tasks';
 import { getDate, getTime } from '@/util/time';
 import CustomLink from '../custom-link';
 
-type Props = {
+type TaskInfoProps = {
 	task: TaskFetch;
 };
-function TaskInfo({ task }: Props) {
+function TaskInfo({ task }: TaskInfoProps) {
 	return (
 		<Group>
 			<Divider size='xl' orientation='vertical' color='red' />

@@ -30,17 +30,17 @@ import { TaskFetch, TaskForm } from '@/types/tasks';
 import { convertToTimestamp, daysRemaining, getColor, getDate } from '@/util/time';
 import TaskLoadError from './error';
 
-type Props = {
+type TaskProps = {
 	edit?: boolean;
 };
 
-type RequiredProps = Required<Props>;
+type RequiredTaskProps = Required<TaskProps>;
 
-const defaultProps: RequiredProps = {
+const defaultProps: RequiredTaskProps = {
 	edit: false,
 };
 
-function TaskIDPage({ params, propsIn }: { params: { id: string }; propsIn: Props }) {
+function TaskIDPage({ params, propsIn }: { params: { id: string }; propsIn: TaskProps }) {
 	useProtectedRoute();
 
 	const task = useUserDocument<TaskFetch>((user) => doc(getFirestore(), `/users/${user.uid}/tasks/${params.id}`));
@@ -48,7 +48,7 @@ function TaskIDPage({ params, propsIn }: { params: { id: string }; propsIn: Prop
 	const days = task[0] ? daysRemaining(task[0].complete) : null;
 
 	const router = useRouter();
-	const props: RequiredProps = { ...defaultProps, ...propsIn };
+	const props: RequiredTaskProps = { ...defaultProps, ...propsIn };
 	const searchParams = useSearchParams();
 
 	const [editMode, setEditMode] = useState<boolean>(props.edit || (searchParams.get('edit') === 'true' ? true : false));

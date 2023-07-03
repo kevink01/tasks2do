@@ -7,7 +7,7 @@ import { scaleTransition } from '@/util/transition';
 import TaskInfo from './task-info';
 import CustomLink from '../custom-link';
 
-type SelectedDate = {
+type DateTasks = {
 	date: Date | null;
 	tasks: TaskFetch[];
 };
@@ -18,36 +18,36 @@ type TaskCalendarProps = {
 };
 
 function TaskCalender({ days, tasks }: TaskCalendarProps) {
-	const [selectedDate, setSelectedDate] = useState<SelectedDate>({ date: null, tasks: [] });
+	const [dateTasks, setDateTasks] = useState<DateTasks>({ date: null, tasks: [] });
 	const [open, setOpen] = useState<boolean>(false);
 
 	const opacity = scaleTransition('X');
 
 	const handleSelectDate = (date: Date) => {
-		if (selectedDate.date && selectedDate.date.valueOf() === date.valueOf()) {
+		if (dateTasks.date && dateTasks.date.valueOf() === date.valueOf()) {
 			setOpen((mode) => !mode);
 		} else {
 			if (tasks) {
-				const dateTasks = tasks
+				const filteredTasks = tasks
 					.filter((task) => getBeginningOfDay(task.complete).valueOf() === date.valueOf())
 					.sort((task1, task2) => {
 						const task1Time = task1.complete.seconds + task1.complete.nanoseconds / 1000000;
 						const task2Time = task2.complete.seconds + task2.complete.nanoseconds / 1000000;
 						return task1Time - task2Time || task1.name > task2.name ? 1 : task1.name < task2.name ? -1 : 0;
 					});
-				if (selectedDate.date !== null) {
-					setSelectedDate({ ...selectedDate, date: null });
+				if (dateTasks.date !== null) {
+					setDateTasks({ ...dateTasks, date: null });
 					setOpen(false);
 					setTimeout(() => {
-						setSelectedDate({ date: date, tasks: dateTasks });
+						setDateTasks({ date: date, tasks: filteredTasks });
 						setOpen(true);
 					}, 200);
 				} else {
-					setSelectedDate({ date: date, tasks: dateTasks });
+					setDateTasks({ date: date, tasks: filteredTasks });
 					setOpen(true);
 				}
 			} else {
-				setSelectedDate({ date: date, tasks: [] });
+				setDateTasks({ date: date, tasks: [] });
 				setOpen(true);
 			}
 		}
@@ -73,29 +73,25 @@ function TaskCalender({ days, tasks }: TaskCalendarProps) {
 						onLevelChange={(level) => {
 							if (open && level !== 'month') {
 								setOpen(false);
-								setSelectedDate({ date: null, tasks: [] });
+								setDateTasks({ date: null, tasks: [] });
 							}
 						}}
 					/>
 				</Center>
-				<Accordion value={open && selectedDate.date ? 'tasks' : 'none'} transitionDuration={200}>
+				<Accordion value={open && dateTasks.date ? 'tasks' : 'none'} transitionDuration={200}>
 					<Accordion.Item value='tasks'>
-						<Accordion.Control disabled={!selectedDate.date} onClick={() => setOpen((state) => !state)}>
+						<Accordion.Control disabled={!dateTasks.date} onClick={() => setOpen((state) => !state)}>
 							<Group>
 								<Text>Tasks for date:</Text>
-								<Transition
-									mounted={selectedDate.date !== null}
-									transition={opacity}
-									duration={200}
-									timingFunction='ease'>
+								<Transition mounted={dateTasks.date !== null} transition={opacity} duration={200} timingFunction='ease'>
 									{(styles) => (
-										<Text style={styles}>{selectedDate.date ? ` ${selectedDate.date.toLocaleDateString()}` : ''}</Text>
+										<Text style={styles}>{dateTasks.date ? ` ${dateTasks.date.toLocaleDateString()}` : ''}</Text>
 									)}
 								</Transition>
 							</Group>
 						</Accordion.Control>
 						<Accordion.Panel>
-							{selectedDate.tasks.length === 0 ? (
+							{dateTasks.tasks.length === 0 ? (
 								<Stack spacing='xs'>
 									<Text align='center'>No tasks for this day</Text>
 									<Text align='center'>How about we create some tasks?</Text>
@@ -109,7 +105,7 @@ function TaskCalender({ days, tasks }: TaskCalendarProps) {
 								</Stack>
 							) : (
 								<Stack spacing='xs' align='left'>
-									{selectedDate.tasks.map((task) => {
+									{dateTasks.tasks.map((task) => {
 										return <TaskInfo task={task} key={task.id} />;
 									})}
 								</Stack>
