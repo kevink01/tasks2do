@@ -50,6 +50,7 @@ function TasksLoader() {
 				<Flex gap='xs'>
 					<Skeleton height={40} className='w-[90%]' />
 					<Skeleton width={110} height={40} />
+					<Skeleton circle height={40} />
 				</Flex>
 				<Skeleton height={40} />
 				<Divider />
