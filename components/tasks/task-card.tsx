@@ -2,11 +2,12 @@ import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 import { Alert, Box, Button, Card, Container, Divider, Grid, rem, Text } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { FaExclamation, FaPen, FaTrash } from 'react-icons/fa';
-import { TaskFetch } from '@/types/tasks';
-import { convertToTimestamp, daysRemaining, getColor } from '@/util/time';
 import { useTasks } from '@/hooks/use-tasks';
+import { useSettings } from '@/hooks/use-settings';
+import { TaskFetch } from '@/types/tasks';
+import { notify } from '@/util/notify';
+import { convertToTimestamp, daysRemaining, getColor } from '@/util/time';
 import CustomLink from '../custom-link';
-import { toast } from 'react-toastify';
 
 type TaskCardProps = {
 	task: TaskFetch;
@@ -15,6 +16,7 @@ type TaskCardProps = {
 
 function TaskCard({ task }: TaskCardProps) {
 	const { deleteTask } = useTasks();
+	const { settings } = useSettings();
 
 	const promptDeleteTask = () => {
 		modals.openConfirmModal({
@@ -32,9 +34,9 @@ function TaskCard({ task }: TaskCardProps) {
 			onConfirm: () => {
 				const result = deleteTask(task);
 				if (result.success) {
-					toast(`Successfully deleted this task`, { type: 'success' });
+					notify('Successfully deleted this task', settings, 'success');
 				} else {
-					toast('Unable to delete task', { type: 'error' });
+					notify('Unable to delete task', settings, 'error');
 				}
 			},
 		});

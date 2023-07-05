@@ -20,13 +20,14 @@ import {
 } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { modals } from '@mantine/modals';
-import { toast } from 'react-toastify';
 import { FaExclamation, FaQuestionCircle } from 'react-icons/fa';
 
 import { useProtectedRoute } from '@/hooks/auth';
 import { useUserDocument } from '@/hooks/firestore';
+import { useSettings } from '@/hooks/use-settings';
 import { useTasks } from '@/hooks/use-tasks';
 import { TaskFetch, TaskForm } from '@/types/tasks';
+import { notify } from '@/util/notify';
 import { convertToTimestamp, daysRemaining, getColor, getDate } from '@/util/time';
 import TaskLoadError from './error';
 
@@ -42,7 +43,7 @@ const defaultProps: RequiredTaskProps = {
 
 function TaskIDPage({ params, propsIn }: { params: { id: string }; propsIn: TaskProps }) {
 	useProtectedRoute();
-
+	const { settings, loading } = useSettings();
 	const task = useUserDocument<TaskFetch>((user) => doc(getFirestore(), `/users/${user.uid}/tasks/${params.id}`));
 	const { updateTask, deleteTask } = useTasks();
 	const days = task[0] ? daysRemaining(task[0].complete) : null;
@@ -117,15 +118,15 @@ function TaskIDPage({ params, propsIn }: { params: { id: string }; propsIn: Task
 			confirmProps: { color: 'green', disabled: noChanges },
 			onConfirm: () => {
 				if (!task[0]) {
-					toast('Task is null', { type: 'error' });
+					notify('Task is null', settings, 'error');
 				} else {
 					date && setValue('complete', date);
 					const result = updateTask(task[0], getValues());
 					if (result.success) {
-						toast('Successfully updated task', { type: 'success' });
+						notify('Successfully updated task', settings, 'success');
 						router.push('/tasks');
 					} else {
-						toast('Unable to update task', { type: 'error' });
+						notify('Unable to update task', settings, 'error');
 					}
 				}
 			},
@@ -147,13 +148,13 @@ function TaskIDPage({ params, propsIn }: { params: { id: string }; propsIn: Task
 			confirmProps: { color: 'red', disabled: !task[0] },
 			onConfirm: () => {
 				if (!task[0]) {
-					toast('Task is null', { type: 'error' });
+					notify('Task is null', settings, 'error');
 				} else {
 					const result = deleteTask(task[0]);
 					if (result.success) {
-						toast(`Successfully deleted this task`, { type: 'success' });
+						notify('Successfully deleted this task', settings, 'success');
 					} else {
-						toast('Unable to delete task', { type: 'error' });
+						notify('Unable to delete task', settings, 'error');
 					}
 				}
 			},
@@ -180,7 +181,7 @@ function TaskIDPage({ params, propsIn }: { params: { id: string }; propsIn: Task
 			confirmProps: { color: 'green', disabled: !task[0] },
 			onConfirm: () => {
 				if (!task[0]) {
-					toast('Task is null', { type: 'error' });
+					notify('Task is null', settings, 'error');
 				} else {
 					setValue('name', task[0].name);
 					setValue('description', task[0].description);
@@ -207,7 +208,7 @@ function TaskIDPage({ params, propsIn }: { params: { id: string }; propsIn: Task
 			<Container size='md' px='xs' pt='lg'>
 				<Card shadow='sm' padding='sm' radius='md' withBorder className='relative'>
 					<LoadingOverlay
-						visible={!task[0] && task[1]}
+						visible={(!task[0] && task[1]) || loading}
 						overlayBlur={2}
 						transitionDuration={500}
 						loaderProps={{ size: 'md', color: 'orange', variant: 'oval' }}

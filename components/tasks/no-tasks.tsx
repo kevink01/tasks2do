@@ -17,7 +17,7 @@ function NoTasks() {
 				</Text>
 			</Stack>
 			<Center mx='auto' my='xl'>
-				<Button size='sm' color='orange' onClick={() => router.push('/dashboard')}>
+				<Button size='sm' color='orange' onClick={() => router.push('/tasks/create')}>
 					Create task
 				</Button>
 			</Center>

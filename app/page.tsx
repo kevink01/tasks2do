@@ -35,7 +35,7 @@ export default function Home() {
 						color='orange'
 						radius='xl'
 						size='lg'
-						onClick={googleSignIn}
+						onClick={() => googleSignIn(router)}
 						className='transition duration-500 ease-in-out hover:bg-orange-700'>
 						Sign in with Google
 					</Button>

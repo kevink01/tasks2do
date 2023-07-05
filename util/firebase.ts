@@ -11,6 +11,8 @@ import {
 } from 'firebase/auth';
 import { connectFirestoreEmulator, doc, getDoc, getFirestore, setDoc } from 'firebase/firestore';
 import { isDev } from './environment';
+import { defaultSettings } from './default';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context';
 
 const firebaseConfig = {
 	apiKey: `${process.env.NEXT_PUBLIC_FIREBASE_API_KEY!}`,
@@ -58,10 +60,9 @@ export const googleProvider = new GoogleAuthProvider() as AuthProvider;
  * Method for signing user in
  * Will add user to database and redirect to dashboard
  */
-export const googleSignIn = () => {
+export const googleSignIn = (router: AppRouterInstance) => {
 	signInWithPopup(getAuth(), googleProvider)
 		.then(async (user: UserCredential) => {
-			const router = useRouter();
 			if ((await getDoc(doc(getFirestore(), `/users/${user.user.uid}`))).exists()) {
 				router.push('/dashboard');
 				return;
@@ -71,6 +72,7 @@ export const googleSignIn = () => {
 				name: user.user.displayName,
 				email: user.user.email,
 				photoURL: user.user.photoURL,
+				settings: defaultSettings,
 			})
 				.then(() => {
 					router.push('/dashboard');
