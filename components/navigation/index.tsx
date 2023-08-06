@@ -68,7 +68,7 @@ function Navigation() {
 					<Tabs.List>
 						{pages.map((page) => {
 							return (
-								<Tabs.Tab value={page} key={page} className='transition ease-in-out duration-300'>
+								<Tabs.Tab value={page} key={`tab-${page}`} className='transition ease-in-out duration-300'>
 									{page.charAt(0).toUpperCase() + page.slice(1)}
 								</Tabs.Tab>
 							);

@@ -20,14 +20,14 @@ import {
 } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { modals } from '@mantine/modals';
-import { FaExclamation, FaQuestionCircle } from 'react-icons/fa';
+import { FaCalendarCheck, FaExclamation, FaQuestionCircle, FaTrash } from 'react-icons/fa';
 
 import { useProtectedRoute } from '@/hooks/auth';
 import { useUserDocument } from '@/hooks/firestore';
 import { useSettings } from '@/hooks/use-settings';
 import { useTasks } from '@/hooks/use-tasks';
 import { TaskFetch, TaskForm } from '@/types/tasks';
-import { notify } from '@/util/notify';
+import { notify, updateNotification } from '@/util/notifications/notify';
 import { convertToTimestamp, daysRemaining, getColor, getDate } from '@/util/time';
 import TaskLoadError from './error';
 
@@ -117,17 +117,25 @@ function TaskIDPage({ params, propsIn }: { params: { id: string }; propsIn: Task
 			labels: { confirm: 'Confirm', cancel: 'Cancel' },
 			confirmProps: { color: 'green', disabled: noChanges },
 			onConfirm: () => {
-				if (!task[0]) {
-					notify('Task is null', settings, 'error');
-				} else {
+				if (task[0]) {
 					date && setValue('complete', date);
+					const id = notify(
+						`update-task-${task[0].id}`,
+						`Updating task: ${task[0].name}`,
+						'Your data will be loaded',
+						true,
+						settings,
+						'info'
+					);
 					const result = updateTask(task[0], getValues());
 					if (result.success) {
-						notify('Successfully updated task', settings, 'success');
+						updateNotification(id, 'Success!', 'Successfully updated task', settings, 'success', <FaCalendarCheck />);
 						router.push('/tasks');
 					} else {
-						notify('Unable to update task', settings, 'error');
+						updateNotification(id, 'Error!', 'Unable to update task', settings, 'error');
 					}
+				} else {
+					notify(`update-task-${task[0]!.id}-null`, 'Error', 'Task is null', false, settings, 'error');
 				}
 			},
 		});
@@ -147,15 +155,23 @@ function TaskIDPage({ params, propsIn }: { params: { id: string }; propsIn: Task
 			labels: { confirm: 'Confirm', cancel: 'Cancel' },
 			confirmProps: { color: 'red', disabled: !task[0] },
 			onConfirm: () => {
-				if (!task[0]) {
-					notify('Task is null', settings, 'error');
-				} else {
+				if (task[0]) {
+					const id = notify(
+						`delete-task-${task[0].id}`,
+						`Deleting task: ${task[0].name}`,
+						'Your data will be loaded',
+						true,
+						settings,
+						'info'
+					);
 					const result = deleteTask(task[0]);
 					if (result.success) {
-						notify('Successfully deleted this task', settings, 'success');
+						updateNotification(id, 'Success!', 'Successfully deleted task', settings, 'success', <FaTrash />);
 					} else {
-						notify('Unable to delete task', settings, 'error');
+						updateNotification(id, 'Error!', 'Unable to delete task', settings, 'error');
 					}
+				} else {
+					notify(`delete-task-${task[0]!.id}-null`, 'Error', 'Task is null', false, settings, 'error');
 				}
 			},
 		});
@@ -180,15 +196,15 @@ function TaskIDPage({ params, propsIn }: { params: { id: string }; propsIn: Task
 			labels: { confirm: 'Confirm', cancel: 'Cancel' },
 			confirmProps: { color: 'green', disabled: !task[0] },
 			onConfirm: () => {
-				if (!task[0]) {
-					notify('Task is null', settings, 'error');
-				} else {
+				if (task[0]) {
 					setValue('name', task[0].name);
 					setValue('description', task[0].description);
 					const resetDate = getDate(task[0].complete);
 					setValue('complete', resetDate);
 					setDate(resetDate);
 					setEditMode(false);
+				} else {
+					notify(`reset-task-${task[0]!.id}-null`, 'Error', 'Task is null', false, settings, 'error');
 				}
 			},
 		});

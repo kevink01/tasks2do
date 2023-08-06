@@ -10,7 +10,8 @@ import { useSettings } from '@/hooks/use-settings';
 import { useTasks } from '@/hooks/use-tasks';
 import { parse } from '@/types/parse';
 import { TaskForm, taskFormSchema } from '@/types/tasks';
-import { notify } from '@/util/notify';
+import { notify, updateNotification } from '@/util/notifications/notify';
+import { FaCalendarCheck } from 'react-icons/fa';
 
 function TaskCreate() {
 	useProtectedRoute();
@@ -36,17 +37,32 @@ function TaskCreate() {
 			return;
 		}
 		register('complete', { value: date });
-		const result = parse<TaskForm>(taskFormSchema, getValues());
-		if (result.success) {
-			const firebaseResult = createTask(result.data);
-			if (firebaseResult.success) {
-				notify(`Successfully created task name ${firebaseResult.data.name}`, settings, 'success');
+		const parsed = parse<TaskForm>(taskFormSchema, getValues());
+		if (parsed.success) {
+			const id = notify(
+				`create-task-${parsed.data.name}`,
+				`Creating task: ${getValues().name}`,
+				'Your data will be loaded',
+				true,
+				settings,
+				'info'
+			);
+			const result = createTask(parsed.data);
+			if (result.success) {
+				updateNotification(
+					id,
+					'Success!',
+					`Successfully created ${result.data.name}`,
+					settings,
+					'success',
+					<FaCalendarCheck />
+				);
 				router.push('/tasks');
 			} else {
-				notify(`Unable to create task`, settings, 'error');
+				updateNotification(id, 'Error!', 'Unable to create task', settings, 'error');
 			}
 		} else {
-			notify('Parsed error', settings, 'error');
+			updateNotification('create-task-error', 'Error!', 'Form data was not valid', settings, 'error');
 		}
 	};
 

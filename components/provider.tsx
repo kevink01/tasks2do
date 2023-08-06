@@ -6,8 +6,8 @@ import { useServerInsertedHTML } from 'next/navigation';
 import { ColorScheme, ColorSchemeProvider, MantineProvider, useEmotionCache, useMantineTheme } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 
-import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Notifications } from '@mantine/notifications';
 
 function CustomMantineProvider({ children }: { children: React.ReactNode }) {
 	const cache = useEmotionCache();
@@ -28,30 +28,21 @@ function CustomMantineProvider({ children }: { children: React.ReactNode }) {
 		setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'));
 
 	return (
-		<CacheProvider value={cache}>
-			<ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
-				<MantineProvider theme={{ colorScheme }} withGlobalStyles withNormalizeCSS>
+		<CacheProvider key={'emotion-cache-provider'} value={cache}>
+			<ColorSchemeProvider
+				key={'mantine-color-scheme-provder'}
+				colorScheme={colorScheme}
+				toggleColorScheme={toggleColorScheme}>
+				<MantineProvider key={'mantine-provider'} theme={{ colorScheme }} withGlobalStyles withNormalizeCSS>
 					<div
-						className='h-screen'
+						key={'mantine-background-color'}
+						className='min-h-screen'
 						style={{
 							backgroundColor: colorScheme === 'dark' ? theme.colors.dark[7] : theme.white,
 							color: colorScheme === 'dark' ? theme.white : theme.colors.gray[7],
 						}}>
-						<ModalsProvider>
-							<ToastContainer
-								position='top-right'
-								autoClose={5000}
-								hideProgressBar={false}
-								newestOnTop={false}
-								closeOnClick
-								rtl={false}
-								pauseOnFocusLoss
-								draggable
-								pauseOnHover
-								theme='dark'
-							/>
-							{children}
-						</ModalsProvider>
+						<Notifications key={'mantine-notification-provider'} />
+						<ModalsProvider key={'mantine-modals-provider'}>{children}</ModalsProvider>
 					</div>
 				</MantineProvider>
 			</ColorSchemeProvider>

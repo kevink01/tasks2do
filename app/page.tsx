@@ -20,7 +20,7 @@ export default function Home() {
 	}, [user, loading, router]);
 
 	return (
-		<Container fluid className={`flex flex-col justify-center items-center w-full h-5/6 space-y-2`}>
+		<Container fluid className={`flex flex-col justify-center items-center w-full h-5/6 mx-auto space-y-2`}>
 			{loading || user ? (
 				<Center>
 					<Loader color='orange' size='xl' variant='dots' />
@@ -36,7 +36,7 @@ export default function Home() {
 						radius='xl'
 						size='lg'
 						onClick={() => googleSignIn(router)}
-						className='transition duration-500 ease-in-out hover:bg-orange-700'>
+						className='w-full transition duration-500 ease-in-out hover:bg-orange-700'>
 						Sign in with Google
 					</Button>
 				</div>

@@ -8,6 +8,7 @@ import {
 	Container,
 	Flex,
 	LoadingOverlay,
+	Notification,
 	NumberInput,
 	Select,
 	Stack,
@@ -16,20 +17,15 @@ import {
 	Text,
 } from '@mantine/core';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
 
 import { useProtectedRoute } from '@/hooks/auth';
 import { useSettings } from '@/hooks/use-settings';
-import {
-	NotificationLocation,
-	NotificationTheme,
-	Settings,
-	notificationLocationOptions,
-	notificationThemeOptions,
-} from '@/types/settings';
+import { NotificationTheme, Settings, notificationThemeOptions } from '@/types/settings';
 import { defaultSettings } from '@/util/default';
-import { notify } from '@/util/notify';
+import { notify, updateNotification } from '@/util/notifications/notify';
 import { capitalize } from '@/util/text';
+import { FaCheck, FaInfo } from 'react-icons/fa';
+import { notifications } from '@mantine/notifications';
 
 function UserSettings() {
 	useProtectedRoute();
@@ -46,24 +42,20 @@ function UserSettings() {
 
 	const testNotify = () => {
 		const values = getValues();
-		console.log(values);
 		if (checked) {
-			toast('Testing a message', {
-				autoClose: values.notification.duration * 1000,
-				position: values.notification.location,
-				theme: values.notification.theme,
-				type: 'success',
-			});
+			notifications.clean();
+			notify(`test-notification-${Date.now().valueOf}`, 'Test', 'Notification test', false, values, 'info');
 		}
 	};
 
 	const submit = () => {
 		setValue('notification.enabled', checked);
+		const id = notify('update-settings', 'Updating settings', 'Waiting for response...', true, settings, 'info');
 		const result = updateSettings(getValues());
 		if (result.success) {
-			notify('Successfully updated settings', settings, 'success');
+			updateNotification(id, 'Success!', 'Successfully updated settings', settings, 'success', <FaCheck />);
 		} else {
-			notify('Unable to update settings', settings, 'error');
+			updateNotification(id, 'Error!', 'Unable to update settings', settings, 'error');
 		}
 	};
 
@@ -154,21 +146,26 @@ function UserSettings() {
 												}}
 												disabled={!checked}
 											/>
-											<Select
-												label='Notification location'
-												placeholder='Select a location'
-												data={notificationLocationOptions.map((value) => {
-													return { label: value, value: value };
-												})}
-												defaultValue={getValues().notification.location}
-												onChange={(value) => {
-													if (value) {
-														setValue('notification.location', value as NotificationLocation);
-													}
-												}}
-												disabled={!checked}
-												transitionProps={{ transition: 'pop-top-left', duration: 200, timingFunction: 'ease' }}
-											/>
+
+											<Stack spacing='xs'>
+												<Notification title='Example notification' withCloseButton={false}>
+													Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+												</Notification>
+												<Notification
+													icon={<FaInfo />}
+													title='Example notification'
+													styles={{
+														root: {
+															backgroundColor: getValues().notification.theme === 'dark' ? 'black' : 'green',
+														},
+													}}
+													withCloseButton={false}>
+													Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+												</Notification>
+												<Notification loading title='Example notification' withCloseButton={false}>
+													Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+												</Notification>
+											</Stack>
 											<Center>
 												<Button type='submit'>Update settings</Button>
 											</Center>

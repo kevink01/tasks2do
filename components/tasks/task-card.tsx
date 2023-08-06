@@ -5,7 +5,7 @@ import { FaExclamation, FaPen, FaTrash } from 'react-icons/fa';
 import { useTasks } from '@/hooks/use-tasks';
 import { useSettings } from '@/hooks/use-settings';
 import { TaskFetch } from '@/types/tasks';
-import { notify } from '@/util/notify';
+import { notify, updateNotification } from '@/util/notifications/notify';
 import { convertToTimestamp, daysRemaining, getColor } from '@/util/time';
 import CustomLink from '../custom-link';
 
@@ -32,11 +32,19 @@ function TaskCard({ task }: TaskCardProps) {
 			labels: { confirm: 'Confirm', cancel: 'Cancel' },
 			confirmProps: { color: 'red' },
 			onConfirm: () => {
+				const id = notify(
+					`delete-task-${task.id}`,
+					`Deleting task: ${task.name}`,
+					'Your data will be loaded',
+					true,
+					settings,
+					'info'
+				);
 				const result = deleteTask(task);
 				if (result.success) {
-					notify('Successfully deleted this task', settings, 'success');
+					updateNotification(id, 'Success', 'Successfully deleted this task', settings, 'success', <FaTrash />);
 				} else {
-					notify('Unable to delete task', settings, 'error');
+					updateNotification(id, 'Error', 'Unable to delete task', settings, 'error');
 				}
 			},
 		});

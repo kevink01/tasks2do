@@ -11,8 +11,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 	return (
 		<html lang='en'>
 			<body className='flex flex-col h-screen mx-auto'>
-				<CustomMantineProvider>
-					{/* <Nav /> */}
+				<CustomMantineProvider key={'custom-provider'}>
 					<Navigation />
 					{children}
 				</CustomMantineProvider>
