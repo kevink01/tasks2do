@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { Accordion, Button, Center, Container, Group, Indicator, Stack, Text, Transition } from '@mantine/core';
+import { Accordion, Button, Center, Container, Group, Indicator, Space, Stack, Text, Transition } from '@mantine/core';
 import { Calendar } from '@mantine/dates';
+import dayjs from 'dayjs';
+
 import { TaskFetch } from '@/types/tasks';
 import { getBeginningOfDay } from '@/util/time';
 import { scaleTransition } from '@/util/transition';
@@ -17,24 +19,33 @@ type TaskCalendarProps = {
 	tasks: TaskFetch[];
 };
 
+function filterTasks(tasks: TaskFetch[], date: Date) {
+	return tasks
+		.filter((task) => getBeginningOfDay(task.complete).valueOf() === date.valueOf())
+		.sort((task1, task2) => {
+			const task1Time = task1.complete.seconds + task1.complete.nanoseconds / 1000000;
+			const task2Time = task2.complete.seconds + task2.complete.nanoseconds / 1000000;
+			return task1Time - task2Time || task1.name > task2.name ? 1 : task1.name < task2.name ? -1 : 0;
+		});
+}
+
 function TaskCalender({ days, tasks }: TaskCalendarProps) {
-	const [dateTasks, setDateTasks] = useState<DateTasks>({ date: null, tasks: [] });
-	const [open, setOpen] = useState<boolean>(false);
+	const today = dayjs(Date.now());
+	const [dateTasks, setDateTasks] = useState<DateTasks>({
+		date: today.toDate(),
+		tasks: filterTasks(tasks, today.toDate()),
+	});
+	const [open, setOpen] = useState<boolean>(true);
 
 	const opacity = scaleTransition('X');
 
 	const handleSelectDate = (date: Date) => {
 		if (dateTasks.date && dateTasks.date.valueOf() === date.valueOf()) {
 			setOpen((mode) => !mode);
+			setDateTasks({ tasks: [], date: null });
 		} else {
 			if (tasks) {
-				const filteredTasks = tasks
-					.filter((task) => getBeginningOfDay(task.complete).valueOf() === date.valueOf())
-					.sort((task1, task2) => {
-						const task1Time = task1.complete.seconds + task1.complete.nanoseconds / 1000000;
-						const task2Time = task2.complete.seconds + task2.complete.nanoseconds / 1000000;
-						return task1Time - task2Time || task1.name > task2.name ? 1 : task1.name < task2.name ? -1 : 0;
-					});
+				const filteredTasks = filterTasks(tasks, date);
 				if (dateTasks.date !== null) {
 					setDateTasks({ ...dateTasks, date: null });
 					setOpen(false);
@@ -56,11 +67,48 @@ function TaskCalender({ days, tasks }: TaskCalendarProps) {
 	return (
 		<Container size='sm' px='xs'>
 			<Stack>
+				<Space h='xs' />
+				<Center>
+					<Group spacing='md'>
+						<Group spacing='xs'>
+							<Indicator color='green'>
+								<></>
+							</Indicator>
+							<Text>Today</Text>
+						</Group>
+						<Group spacing='xs'>
+							<Indicator color='blue'>
+								<></>
+							</Indicator>
+							<Text>Selected date</Text>
+						</Group>
+						<Group spacing='xs'>
+							<Indicator color='red'>
+								<></>
+							</Indicator>
+							<Text>Task</Text>
+						</Group>
+					</Group>
+				</Center>
 				<Center>
 					<Calendar
 						size='md'
 						firstDayOfWeek={0}
 						renderDay={(date) => {
+							if (Math.floor(dayjs(dateTasks.date).diff(date, 'd', true)) === 0) {
+								return (
+									<Indicator color={days.includes(date.valueOf()) ? 'red' : 'blue'} offset={-2}>
+										<div>{date.getDate()}</div>
+									</Indicator>
+								);
+							}
+							if (Math.floor(today.diff(date, 'd', true)) === 0) {
+								return (
+									<Indicator color={days.includes(date.valueOf()) ? 'red' : 'green'} offset={-2}>
+										<div>{date.getDate()}</div>
+									</Indicator>
+								);
+							}
 							return (
 								<Indicator color='red' offset={-2} disabled={!days.includes(date.valueOf())}>
 									<div>{date.getDate()}</div>
@@ -98,7 +146,7 @@ function TaskCalender({ days, tasks }: TaskCalendarProps) {
 									<Center>
 										<CustomLink href='/tasks/create'>
 											<Button color='orange' mx='auto'>
-												Create tasks
+												Create task
 											</Button>
 										</CustomLink>
 									</Center>
