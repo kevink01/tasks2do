@@ -4,7 +4,7 @@ import { modals } from '@mantine/modals';
 import { FaExclamation, FaPen, FaTrash } from 'react-icons/fa';
 import { useTasks } from '@/hooks/use-tasks';
 import { useSettings } from '@/hooks/use-settings';
-import { TaskFetch } from '@/types/tasks';
+import { TaskFetch } from '@/types/task';
 import { notify, updateNotification } from '@/util/notifications/notify';
 import { convertToTimestamp, daysRemaining, getColor } from '@/util/time';
 import CustomLink from '../custom-link';

@@ -2,7 +2,7 @@ import { collection, deleteDoc, doc, getFirestore, setDoc } from 'firebase/fires
 import { v4 as uuid } from 'uuid';
 import { useIsAuthenticated } from './auth';
 import { useUserCollection } from './firestore';
-import { Task, TaskFetch, TaskForm, taskFetchSchema, taskSchema } from '@/types/tasks';
+import { Task, TaskFetch, TaskForm, taskFetchSchema, taskSchema } from '@/types/task';
 import { parse } from '@/types/parse';
 import { FirebaseResult } from '@/types/firebase';
 import { getDate } from '@/util/time';

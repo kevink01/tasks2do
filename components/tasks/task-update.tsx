@@ -8,7 +8,7 @@ import { modals } from '@mantine/modals';
 
 import { useTasks } from '@/hooks/use-tasks';
 import { Settings } from '@/types/settings';
-import { TaskFetch, TaskForm } from '@/types/tasks';
+import { TaskFetch, TaskForm } from '@/types/task';
 import { notify, updateNotification } from '@/util/notifications/notify';
 import { getDate } from '@/util/time';
 

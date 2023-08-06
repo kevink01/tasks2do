@@ -13,7 +13,7 @@ import { useProtectedRoute } from '@/hooks/auth';
 import { useUserDocument } from '@/hooks/firestore';
 import { useSettings } from '@/hooks/use-settings';
 import { useTasks } from '@/hooks/use-tasks';
-import { TaskFetch } from '@/types/tasks';
+import { TaskFetch } from '@/types/task';
 import { notify, updateNotification } from '@/util/notifications/notify';
 import { fadeTransition } from '@/util/transition';
 import TaskLoadError from './error';

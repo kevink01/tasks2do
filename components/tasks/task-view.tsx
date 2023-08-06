@@ -1,5 +1,5 @@
 import { Button, Card, Divider, Flex, Group, Text, rem } from '@mantine/core';
-import { TaskFetch } from '@/types/tasks';
+import { TaskFetch } from '@/types/task';
 import { convertToTimestamp, daysRemaining, getColor } from '@/util/time';
 
 type TaskViewProps = {

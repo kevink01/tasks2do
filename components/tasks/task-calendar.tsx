@@ -3,7 +3,7 @@ import { Accordion, Button, Center, Container, Group, Indicator, Space, Stack, T
 import { Calendar } from '@mantine/dates';
 import dayjs from 'dayjs';
 
-import { TaskFetch } from '@/types/tasks';
+import { TaskFetch } from '@/types/task';
 import { getBeginningOfDay } from '@/util/time';
 import { scaleTransition } from '@/util/transition';
 import TaskInfo from './task-info';

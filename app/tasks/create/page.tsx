@@ -9,7 +9,7 @@ import { useProtectedRoute } from '@/hooks/auth';
 import { useSettings } from '@/hooks/use-settings';
 import { useTasks } from '@/hooks/use-tasks';
 import { parse } from '@/types/parse';
-import { TaskForm, taskFormSchema } from '@/types/tasks';
+import { TaskForm, taskFormSchema } from '@/types/task';
 import { notify, updateNotification } from '@/util/notifications/notify';
 import { FaCalendarCheck } from 'react-icons/fa';
 

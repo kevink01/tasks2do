@@ -1,5 +1,5 @@
 import { Divider, Group, Stack, Text, Title } from '@mantine/core';
-import { TaskFetch } from '@/types/tasks';
+import { TaskFetch } from '@/types/task';
 import { getDate, getTime } from '@/util/time';
 import CustomLink from '../custom-link';
 
