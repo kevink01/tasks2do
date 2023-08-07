@@ -2,8 +2,6 @@
 
 import AccordionLoader from '@/components/loaders/accordion-loader';
 
-export function TasksLoader() {
+export default function RemindersLoader() {
 	return <AccordionLoader />;
 }
-
-export default TasksLoader;

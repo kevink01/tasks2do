@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Accordion, ActionIcon, Box, Button, Container, Grid, Tooltip, Transition, rem } from '@mantine/core';
 import { FaCalendar, FaTable } from 'react-icons/fa';
 import CustomLink from '@/components/custom-link';
+import { GridLoader } from '@/components/loaders/grid-loader';
 import NoTasks from '@/components/tasks/no-tasks';
 import TaskCard from '@/components/tasks/task-card';
 import TaskCalender from '@/components/tasks/task-calendar';
@@ -12,7 +13,6 @@ import { useProtectedRoute } from '@/hooks/auth';
 import { useTasks } from '@/hooks/use-tasks';
 import { getBeginningOfDay } from '@/util/time';
 import { fadeTransition } from '@/util/transition';
-import { TasksGridLoader } from './loading';
 
 function Tasks() {
 	useProtectedRoute();
@@ -65,26 +65,22 @@ function Tasks() {
 				</Accordion.Item>
 			</Accordion>
 			{!tasks ? (
-				<TasksGridLoader />
+				<GridLoader />
 			) : tasks.length === 0 ? (
 				<NoTasks />
-			) : calendarMode ? (
-				<Transition mounted={!transition} transition={fadeTransition()} duration={200} timingFunction='ease'>
-					{(styles) => (
-						<div style={styles}>
-							<TaskCalender days={days} tasks={tasks} />
-						</div>
-					)}
-				</Transition>
 			) : (
 				<Transition mounted={!transition} transition={fadeTransition()} duration={200} timingFunction='ease'>
 					{(styles) => (
 						<div style={styles}>
-							<Grid gutter={5}>
-								{tasks.map((task) => {
-									return <TaskCard key={task.id} task={task} router={router} />;
-								})}
-							</Grid>
+							{calendarMode ? (
+								<TaskCalender days={days} tasks={tasks} />
+							) : (
+								<Grid gutter={5}>
+									{tasks.map((task) => {
+										return <TaskCard key={task.id} task={task} router={router} />;
+									})}
+								</Grid>
+							)}
 						</div>
 					)}
 				</Transition>
