@@ -62,7 +62,14 @@ function TaskCreate() {
 				updateNotification(id, 'Error!', 'Unable to create task', settings, 'error');
 			}
 		} else {
-			updateNotification('create-task-error', 'Error!', 'Form data was not valid', settings, 'error');
+			notify(
+				`create-task-error-${Date.now().valueOf()}`,
+				'Error!',
+				'Form data was not valid',
+				false,
+				settings,
+				'error'
+			);
 		}
 	};
 
@@ -86,13 +93,13 @@ function TaskCreate() {
 							error={errors.name?.message}
 							{...register('name', {
 								minLength: {
-									value: 5,
+									value: 3,
 									message: 'Minimum length is 5',
 								},
 							})}
 						/>
 						<Textarea
-							placeholder='Your description'
+							placeholder='Task description'
 							label='Description'
 							radius='md'
 							size='md'
@@ -118,7 +125,9 @@ function TaskCreate() {
 						/>
 					</Stack>
 					<Center mt={rem(10)}>
-						<Button type='submit'>Create task</Button>
+						<Button type='submit' color='orange'>
+							Create task
+						</Button>
 					</Center>
 				</Box>
 			</form>

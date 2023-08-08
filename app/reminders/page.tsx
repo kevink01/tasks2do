@@ -40,8 +40,8 @@ function Reminders() {
 
 	return (
 		<Container size='lg' px='xs'>
-			<Accordion defaultValue='tasks' pb={rem(10)}>
-				<Accordion.Item value='tasks'>
+			<Accordion defaultValue='reminders' pb={rem(10)}>
+				<Accordion.Item value='reminders'>
 					<Box sx={{ display: 'flex', alignItems: 'center', gap: rem(10) }}>
 						<Accordion.Control>Reminders</Accordion.Control>
 						<CustomLink href='/reminders/create'>
@@ -81,7 +81,7 @@ function Reminders() {
 							) : (
 								<Grid gutter={5}>
 									{reminders.map((reminder) => {
-										return <ReminderCard key={reminder.id} />;
+										return <ReminderCard key={reminder.id} reminder={reminder} />;
 									})}
 								</Grid>
 							)}

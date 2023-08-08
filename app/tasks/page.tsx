@@ -77,7 +77,7 @@ function Tasks() {
 							) : (
 								<Grid gutter={5}>
 									{tasks.map((task) => {
-										return <TaskCard key={task.id} task={task} router={router} />;
+										return <TaskCard key={task.id} task={task} />;
 									})}
 								</Grid>
 							)}

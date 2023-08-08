@@ -9,6 +9,7 @@ import { parse } from '@/types/parse';
 type RemindersInstance = {
 	reminders: ReminderFetch[] | null;
 	createReminder: (reminder: ReminderForm) => FirebaseResult<Reminder>;
+	deleteReminder: (reminder: ReminderFetch) => FirebaseResult<undefined>;
 };
 
 export default function useReminders(): RemindersInstance {
@@ -33,5 +34,9 @@ export default function useReminders(): RemindersInstance {
 		return { success: false, error: 'User not logged in' };
 	}
 
-	return { reminders, createReminder };
+	function deleteReminder(reminder: ReminderFetch): FirebaseResult<undefined> {
+		return { success: true, data: undefined };
+	}
+
+	return { reminders, createReminder, deleteReminder };
 }

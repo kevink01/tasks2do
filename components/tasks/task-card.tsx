@@ -11,7 +11,6 @@ import CustomLink from '../custom-link';
 
 type TaskCardProps = {
 	task: TaskFetch;
-	router: AppRouterInstance;
 };
 
 function TaskCard({ task }: TaskCardProps) {
@@ -66,7 +65,7 @@ function TaskCard({ task }: TaskCardProps) {
 					<Divider />
 					<Text size='md'>
 						<Text fs='italic'>Complete on:</Text>
-						{convertToTimestamp(task.complete)}
+						<Text>{convertToTimestamp(task.complete)}</Text>
 						<Text color={getColor(date)}>{`(${date.message})`}</Text>
 					</Text>
 				</Card.Section>
@@ -86,11 +85,11 @@ function TaskCard({ task }: TaskCardProps) {
 				<Card.Section ml={rem(4)} pb={rem(4)}>
 					<Text fz='sm' display='flex' sx={{ gap: rem(4) }}>
 						<Text fs='italic'>Created on:</Text>
-						{convertToTimestamp(task.created)}
+						<Text>{convertToTimestamp(task.created)}</Text>
 					</Text>
 					<Text fz='sm' display='flex' sx={{ gap: rem(4) }}>
 						<Text fs='italic'>Last updated:</Text>
-						{convertToTimestamp(task.updated)}
+						<Text>{convertToTimestamp(task.updated)}</Text>
 					</Text>
 				</Card.Section>
 			</Card>

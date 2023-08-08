@@ -96,28 +96,22 @@ function TaskIDPage({ params, propsIn }: { params: { id: string }; propsIn: Task
 					/>
 					{!task[0] && task[3] && !task[3].exists() ? (
 						<TaskLoadError />
-					) : editMode ? (
-						<Transition mounted={!transition} transition={fadeTransition()} duration={200} timingFunction='ease'>
-							{(styles) => (
-								<div style={styles}>
-									{task[0] && settings && (
-										<UpdateTask
-											task={task[0]}
-											settings={settings}
-											promptDeleteTask={promptDeleteTask}
-											toggleEditMode={toggleEditMode}
-										/>
-									)}
-								</div>
-							)}
-						</Transition>
 					) : (
 						<Transition mounted={!transition} transition={fadeTransition()} duration={200} timingFunction='ease'>
 							{(styles) => (
 								<div style={styles}>
-									{task[0] && settings && (
-										<TaskView task={task[0]} promptDeleteTask={promptDeleteTask} toggleEditMode={toggleEditMode} />
-									)}
+									{editMode
+										? (task[0] && settings && (
+												<UpdateTask
+													task={task[0]}
+													settings={settings}
+													promptDeleteTask={promptDeleteTask}
+													toggleEditMode={toggleEditMode}
+												/>
+										  )) ?? <></>
+										: (task[0] && settings && (
+												<TaskView task={task[0]} promptDeleteTask={promptDeleteTask} toggleEditMode={toggleEditMode} />
+										  )) ?? <></>}
 								</div>
 							)}
 						</Transition>

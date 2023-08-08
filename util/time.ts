@@ -35,13 +35,19 @@ export function getTime(date: Date): string {
 /**
  * Converts the timestamp into a timezone-friendly string
  * @param timestamp The firebase timestamp (includes seconds & nanoseconds)
+ * @param [allDay=true] Flag for including time (defaults to true)
  * @returns Date & time (M/D/yyyy hh:mm a tz format)
  */
-export function convertToTimestamp(timestamp: FirebaseTimestamp): string {
+export function convertToTimestamp(timestamp: FirebaseTimestamp, allDay: boolean = true): string {
 	const date = getDate(timestamp);
-	return `${date.toLocaleDateString()} ${getTime(date)}`;
+	return `${date.toLocaleDateString()}${!allDay ? ' ' + getTime(date) : ''}`;
 }
 
+/**
+ * Returns the beginning of the day
+ * @param timestamp The firebase timestamp (includes seconds & nanoseconds)
+ * @returns Date at 12:00 AM
+ */
 export function getBeginningOfDay(timestamp: FirebaseTimestamp): Date {
 	const date = getDate(timestamp);
 	return moment(date).startOf('day').toDate();
