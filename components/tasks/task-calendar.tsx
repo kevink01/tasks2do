@@ -15,11 +15,10 @@ type DateTasks = {
 };
 
 type TaskCalendarProps = {
-	days: number[];
 	tasks: TaskFetch[];
 };
 
-function filterTasks(tasks: TaskFetch[], date: Date) {
+function filterTasks(tasks: TaskFetch[], date: Date): TaskFetch[] {
 	return tasks
 		.filter((task) => getBeginningOfDay(task.complete).valueOf() === date.valueOf())
 		.sort((task1, task2) => {
@@ -29,10 +28,13 @@ function filterTasks(tasks: TaskFetch[], date: Date) {
 		});
 }
 
-function TaskCalender({ days, tasks }: TaskCalendarProps) {
+function TaskCalender({ tasks }: TaskCalendarProps) {
 	const today = dayjs(Date.now());
+	const days = tasks.map((task) => {
+		return getBeginningOfDay(task.complete).valueOf();
+	});
 	const [dateTasks, setDateTasks] = useState<DateTasks>({
-		date: today.toDate(),
+		date: null,
 		tasks: filterTasks(tasks, today.toDate()),
 	});
 	const [open, setOpen] = useState<boolean>(true);
@@ -51,16 +53,14 @@ function TaskCalender({ days, tasks }: TaskCalendarProps) {
 					setOpen(false);
 					setTimeout(() => {
 						setDateTasks({ date: date, tasks: filteredTasks });
-						setOpen(true);
 					}, 200);
 				} else {
 					setDateTasks({ date: date, tasks: filteredTasks });
-					setOpen(true);
 				}
 			} else {
 				setDateTasks({ date: date, tasks: [] });
-				setOpen(true);
 			}
+			setOpen(true);
 		}
 	};
 
@@ -131,7 +131,7 @@ function TaskCalender({ days, tasks }: TaskCalendarProps) {
 						<Accordion.Control disabled={!dateTasks.date} onClick={() => setOpen((state) => !state)}>
 							<Group>
 								<Text>Tasks for date:</Text>
-								<Transition mounted={dateTasks.date !== null} transition={opacity} duration={200} timingFunction='ease'>
+								<Transition mounted={open} transition={opacity} duration={200} timingFunction='ease'>
 									{(styles) => (
 										<Text style={styles}>{dateTasks.date ? ` ${dateTasks.date.toLocaleDateString()}` : ''}</Text>
 									)}

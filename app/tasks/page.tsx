@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Accordion, ActionIcon, Box, Button, Container, Grid, Tooltip, Transition, rem } from '@mantine/core';
 import { FaCalendar, FaTable } from 'react-icons/fa';
@@ -11,16 +11,13 @@ import TaskCard from '@/components/tasks/task-card';
 import TaskCalender from '@/components/tasks/task-calendar';
 import { useProtectedRoute } from '@/hooks/auth';
 import { useTasks } from '@/hooks/use-tasks';
-import { getBeginningOfDay } from '@/util/time';
 import { fadeTransition } from '@/util/transition';
 
 function Tasks() {
 	useProtectedRoute();
 	const { tasks } = useTasks();
-	const router = useRouter();
 
 	const [calendarMode, setCalenderMode] = useState<boolean>(false);
-	const [days, setDays] = useState<number[]>([]);
 	const [transition, setTransition] = useState<boolean>(false);
 
 	const toggleCalendarMode = () => {
@@ -30,15 +27,6 @@ function Tasks() {
 			setTransition(false);
 		}, 200);
 	};
-
-	useEffect(() => {
-		if (!tasks) return;
-		setDays(
-			tasks.map((task) => {
-				return getBeginningOfDay(task.complete).valueOf();
-			})
-		);
-	}, [tasks]);
 
 	return (
 		<Container size='lg' px='xs'>
@@ -73,7 +61,7 @@ function Tasks() {
 					{(styles) => (
 						<div style={styles}>
 							{calendarMode ? (
-								<TaskCalender days={days} tasks={tasks} />
+								<TaskCalender tasks={tasks} />
 							) : (
 								<Grid gutter={5}>
 									{tasks.map((task) => {

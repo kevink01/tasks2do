@@ -1,24 +1,24 @@
 'use client';
 
-import { FaTable, FaCalendar } from 'react-icons/fa';
+import { useState } from 'react';
 import { Accordion, ActionIcon, Box, Button, Container, Grid, Tooltip, Transition, rem } from '@mantine/core';
+import { FaTable, FaCalendar } from 'react-icons/fa';
+
 import CustomLink from '@/components/custom-link';
-import { useEffect, useState } from 'react';
+import { GridLoader } from '@/components/loaders/grid-loader';
+import NoReminders from '@/components/reminders/no-reminders';
+import ReminderCalendar from '@/components/reminders/reminder-calendar';
+import ReminderCard from '@/components/reminders/reminder-card';
 import { useProtectedRoute } from '@/hooks/auth';
 import useReminders from '@/hooks/use-reminders';
 import { getBeginningOfDay } from '@/util/time';
-import { GridLoader } from '@/components/loaders/grid-loader';
-import NoReminders from '@/components/reminders/no-reminders';
 import { fadeTransition } from '@/util/transition';
-import ReminderCalendar from '@/components/reminders/reminder-calendar';
-import ReminderCard from '@/components/reminders/reminder-card';
 
 function Reminders() {
 	useProtectedRoute();
 	const { reminders } = useReminders();
 
 	const [calendarMode, setCalendarMode] = useState<boolean>(false);
-	const [days, setDays] = useState<number[]>([]);
 	const [transition, setTransition] = useState<boolean>(false);
 
 	const toggleCalendarMode = () => {
@@ -28,15 +28,6 @@ function Reminders() {
 			setTransition(false);
 		}, 200);
 	};
-
-	useEffect(() => {
-		if (!reminders) return;
-		setDays(
-			reminders.map((reminder) => {
-				return getBeginningOfDay(reminder.complete).valueOf();
-			})
-		);
-	}, [reminders]);
 
 	return (
 		<Container size='lg' px='xs'>
@@ -77,7 +68,7 @@ function Reminders() {
 					{(styles) => (
 						<div style={styles}>
 							{calendarMode ? (
-								<ReminderCalendar />
+								<ReminderCalendar reminders={reminders} />
 							) : (
 								<Grid gutter={5}>
 									{reminders.map((reminder) => {
