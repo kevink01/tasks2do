@@ -9,7 +9,7 @@ import { notify, updateNotification } from '@/util/notifications/notify';
 import { Alert, Card, Container, LoadingOverlay, Transition, rem } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { doc, getFirestore } from 'firebase/firestore';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { FaExclamation, FaTrash } from 'react-icons/fa';
 import ReminderLoading from './loading';
@@ -38,6 +38,7 @@ export default function ReminderIDPage({ params, propsIn }: { params: { id: stri
 
 	const props: RequiredReminderProps = { ...defaultProps, ...propsIn };
 	const searchParams = useSearchParams();
+	const router = useRouter();
 
 	const [editMode, setEditMode] = useState<boolean>(props.edit || (searchParams.get('edit') === 'true' ? true : false));
 	const [transition, setTransition] = useState<boolean>(false);
@@ -47,6 +48,9 @@ export default function ReminderIDPage({ params, propsIn }: { params: { id: stri
 		setTimeout(() => {
 			setEditMode((mode) => edit ?? !mode);
 			setTransition(false);
+			searchParams.has('edit')
+				? router.replace(`/reminders/${params.id}`)
+				: router.replace(`/reminders/${params.id}?edit=true`);
 		}, 200);
 	};
 

@@ -1,9 +1,11 @@
 'use client';
 
 import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
 	ActionIcon,
+	Alert,
+	Container,
 	Flex,
 	Group,
 	Header,
@@ -16,15 +18,50 @@ import {
 import ProfileMenu from './menu/profile';
 import ThemeMenu from './menu/theme';
 import t2d from '@/public/task2DoLogo-RemovedBG.png';
+import { modals } from '@mantine/modals';
+import { FaExclamation } from 'react-icons/fa';
 
 const pages: string[] = ['home', 'tasks', 'reminders', 'events'];
 
 function Navigation() {
 	const pathname = usePathname();
 	const router = useRouter();
+	const searchParams = useSearchParams();
 
 	const theme = useMantineTheme();
 	const { colorScheme } = useMantineColorScheme();
+
+	const handlePageChange = (page: string) => {
+		if (searchParams.has('edit') || pathname.includes('create') || pathname.includes('settings')) {
+			modals.openConfirmModal({
+				centered: false,
+				children: (
+					<Container>
+						<Alert
+							icon={<FaExclamation />}
+							title='Are you sure you want to leave this page?'
+							color='red'
+							radius='xs'
+							mb={rem(4)}>
+							Any unsaved progress will be lost
+						</Alert>
+					</Container>
+				),
+				labels: { confirm: 'Confirm', cancel: 'Cancel' },
+				confirmProps: { color: 'green' },
+				onConfirm: () => {
+					page === 'home' ? router.push('/') : router.push(page);
+					return;
+				},
+				onCancel: () => {
+					return;
+				},
+			});
+		} else {
+			page === 'home' ? router.push('/') : router.push(page);
+			return;
+		}
+	};
 
 	return (
 		<Header
@@ -60,7 +97,7 @@ function Navigation() {
 					defaultValue='home'
 					value={pathname === '/' || pathname === '/dashboard' ? 'home' : (pathname.slice(1).split('/')[0] as string)}
 					onTabChange={(page) => {
-						page === 'home' ? router.push('/') : router.push(page as string);
+						handlePageChange(page as string);
 					}}
 					variant='pills'
 					radius='lg'
