@@ -16,7 +16,8 @@ import { useTasks } from '@/hooks/use-tasks';
 import { TaskFetch } from '@/types/task';
 import { notify, updateNotification } from '@/util/notifications/notify';
 import { fadeTransition } from '@/util/transition';
-import TaskLoadError from './error';
+import TaskError from './error';
+import TaskLoader from './loading';
 
 type TaskProps = {
 	edit?: boolean;
@@ -78,47 +79,47 @@ function TaskIDPage({ params, propsIn }: { params: { id: string }; propsIn: Task
 						updateNotification(id, 'Error!', 'Unable to delete task', settings, 'error');
 					}
 				} else {
-					notify(`delete-task-${task[0]!.id}-null`, 'Error', 'Task is null', false, settings, 'error');
+					notify(`delete-task-${Date.now()}-null`, 'Error', 'Task is null', false, settings, 'error');
 				}
 			},
 		});
 	};
 
 	return (
-		<>
-			<Container size='md' px='xs' pt='lg'>
-				<Card shadow='sm' padding='sm' radius='md' withBorder className='relative'>
-					<LoadingOverlay
-						visible={(!task[0] && task[1]) || loading}
-						overlayBlur={2}
-						transitionDuration={500}
-						loaderProps={{ size: 'md', color: 'orange', variant: 'oval' }}
-					/>
-					{!task[0] && task[3] && !task[3].exists() ? (
-						<TaskLoadError />
-					) : (
-						<Transition mounted={!transition} transition={fadeTransition()} duration={200} timingFunction='ease'>
-							{(styles) => (
-								<div style={styles}>
-									{editMode
-										? (task[0] && settings && (
-												<UpdateTask
-													task={task[0]}
-													settings={settings}
-													promptDeleteTask={promptDeleteTask}
-													toggleEditMode={toggleEditMode}
-												/>
-										  )) ?? <></>
-										: (task[0] && settings && (
-												<TaskView task={task[0]} promptDeleteTask={promptDeleteTask} toggleEditMode={toggleEditMode} />
-										  )) ?? <></>}
-								</div>
-							)}
-						</Transition>
-					)}
-				</Card>
-			</Container>
-		</>
+		<Container size='md' px='xs' pt='lg'>
+			<Card shadow='sm' padding='sm' radius='md' withBorder className='relative'>
+				<LoadingOverlay
+					visible={(!task[0] && task[1]) || loading}
+					overlayBlur={2}
+					transitionDuration={500}
+					loaderProps={{ size: 'md', color: 'orange', variant: 'oval' }}
+				/>
+				{!task[0] || !settings ? (
+					<TaskLoader />
+				) : !task[0] && task[3] && !task[3].exists() ? (
+					<TaskError />
+				) : (
+					<Transition mounted={!transition} transition={fadeTransition()} duration={200} timingFunction='ease'>
+						{(styles) => (
+							<div style={styles}>
+								{editMode
+									? (task[0] && (
+											<UpdateTask
+												task={task[0]}
+												settings={settings}
+												promptDeleteTask={promptDeleteTask}
+												toggleEditMode={toggleEditMode}
+											/>
+									  )) ?? <TaskLoader />
+									: (task[0] && (
+											<TaskView task={task[0]} promptDeleteTask={promptDeleteTask} toggleEditMode={toggleEditMode} />
+									  )) ?? <TaskLoader />}
+							</div>
+						)}
+					</Transition>
+				)}
+			</Card>
+		</Container>
 	);
 }
 

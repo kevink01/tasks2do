@@ -1,9 +1,9 @@
 'use client';
 
 import { Button, Center, Stack, Text, Title } from '@mantine/core';
-import router from 'next/router';
+import CustomLink from '@/components/custom-link';
 
-function TaskLoadError() {
+export default function TaskError() {
 	return (
 		<Stack>
 			<Title align='center' order={2}>
@@ -13,12 +13,12 @@ function TaskLoadError() {
 				The task does not exist
 			</Text>
 			<Center mx='auto' my='xl'>
-				<Button size='sm' color='orange' onClick={() => router.push('/dashboard')}>
-					Dashboard
-				</Button>
+				<CustomLink href='/dashboard'>
+					<Button size='sm' color='orange'>
+						Dashboard
+					</Button>
+				</CustomLink>
 			</Center>
 		</Stack>
 	);
 }
-
-export default TaskLoadError;

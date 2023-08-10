@@ -71,7 +71,7 @@ function TaskCard({ task }: TaskCardProps) {
 				</Card.Section>
 				<Card.Section ml={rem(4)} mt={rem(4)} mb={rem(4)}>
 					<Box sx={{ display: 'flex', gap: rem(4) }}>
-						<CustomLink href={`/tasks/${task.id}`}>
+						<CustomLink href={`/tasks/${task.id}?edit=true`}>
 							<Button color='orange' leftIcon={<FaPen />}>
 								Update task
 							</Button>

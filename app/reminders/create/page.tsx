@@ -32,7 +32,7 @@ export default function ReminderCreate() {
 
 	const router = useRouter();
 
-	const [date, setDate] = useState<Date | null>();
+	const [date, setDate] = useState<Date | null>(null);
 	const [checked, setChecked] = useState<boolean>(false);
 
 	const {
@@ -149,7 +149,7 @@ export default function ReminderCreate() {
 								clearErrors('complete');
 							}}
 							error={errors.complete?.message}
-							disabled={!checked}
+							disabled={checked && date !== null}
 						/>
 					</Stack>
 					<Center mt={rem(10)}>

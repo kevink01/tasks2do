@@ -3,7 +3,7 @@
 import useReminders from '@/hooks/use-reminders';
 import { useSettings } from '@/hooks/use-settings';
 import { ReminderFetch } from '@/types/reminder';
-import { convertToTimestamp, daysRemaining, getColor } from '@/util/time';
+import { convertToDay, convertToTimestamp, daysRemaining, getColor } from '@/util/time';
 import { Alert, Box, Button, Card, Container, Divider, Grid, Group, rem, Text } from '@mantine/core';
 import React from 'react';
 import CustomLink from '../custom-link';
@@ -57,7 +57,7 @@ export default function ReminderCard({ reminder }: ReminderCardProps) {
 		<Grid.Col span={4} key={reminder.id}>
 			<Card shadow='sm' padding='sm' radius='md' withBorder className='hover:cursor-pointer'>
 				<Card.Section ml={rem(4)}>
-					<CustomLink href={`/reminder/${reminder.id}`}>
+					<CustomLink href={`/reminders/${reminder.id}`}>
 						<Text size='xl' td='underline'>
 							{reminder.name}
 						</Text>
@@ -68,22 +68,22 @@ export default function ReminderCard({ reminder }: ReminderCardProps) {
 					<Divider />
 					<Text size='md'>
 						<Text fs='italic'>Complete on:</Text>
-						{reminder.allDay ? (
-							<Group>
-								<Text>{convertToTimestamp(reminder.complete, reminder.allDay)}</Text>
-								<Text color='blue'>(All day)</Text>
-							</Group>
-						) : (
-							<>
-								<Text>{convertToTimestamp(reminder.complete, reminder.allDay)}</Text>
-								<Text color={getColor(date)}>{`(${date.message})`}</Text>
-							</>
-						)}
+						<Group>
+							{reminder.allDay ? (
+								<>
+									<Text>{convertToDay(reminder.complete, reminder.allDay)}</Text>
+									<Text color='blue'>(All day)</Text>
+								</>
+							) : (
+								<Text>{convertToDay(reminder.complete, reminder.allDay)}</Text>
+							)}
+						</Group>
+						<Text color={getColor(date)}>{`(${date.message})`}</Text>
 					</Text>
 				</Card.Section>
 				<Card.Section ml={rem(4)} mt={rem(4)} mb={rem(4)}>
 					<Box sx={{ display: 'flex', gap: rem(4) }}>
-						<CustomLink href={`/tasks/${reminder.id}`}>
+						<CustomLink href={`/reminders/${reminder.id}?edit=true`}>
 							<Button color='orange' leftIcon={<FaPen />}>
 								Update reminder
 							</Button>

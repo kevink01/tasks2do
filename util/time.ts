@@ -32,15 +32,26 @@ export function getDate(timestamp: FirebaseTimestamp): Date {
 export function getTime(date: Date): string {
 	return moment(date).tz(Intl.DateTimeFormat().resolvedOptions().timeZone).format('h:mm A z');
 }
+
+/**
+ * Converts the timestamp into a timezone-friendly string
+ * @param timestamp The firebase timestamp (includes seconds & nanoseconds)
+ * @returns Date & time (M/D/yyyy hh:mm a tz format)
+ */
+export function convertToTimestamp(timestamp: FirebaseTimestamp): string {
+	const date = getDate(timestamp);
+	return `${date.toLocaleDateString()} ${getTime(date)}`;
+}
+
 /**
  * Converts the timestamp into a timezone-friendly string
  * @param timestamp The firebase timestamp (includes seconds & nanoseconds)
  * @param [allDay=true] Flag for including time (defaults to true)
  * @returns Date & time (M/D/yyyy hh:mm a tz format)
  */
-export function convertToTimestamp(timestamp: FirebaseTimestamp, allDay: boolean = true): string {
+export function convertToDay(timestamp: FirebaseTimestamp, includeTime: boolean = true): string {
 	const date = getDate(timestamp);
-	return `${date.toLocaleDateString()}${!allDay ? ' ' + getTime(date) : ''}`;
+	return `${date.toLocaleDateString()}${!includeTime ? ' ' + getTime(date) : ''}`;
 }
 
 /**
@@ -50,6 +61,10 @@ export function convertToTimestamp(timestamp: FirebaseTimestamp, allDay: boolean
  */
 export function getBeginningOfDay(timestamp: FirebaseTimestamp): Date {
 	const date = getDate(timestamp);
+	return moment(date).startOf('day').toDate();
+}
+
+export function getBeginningOfDate(date: Date): Date {
 	return moment(date).startOf('day').toDate();
 }
 

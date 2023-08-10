@@ -11,7 +11,6 @@ import ReminderCalendar from '@/components/reminders/reminder-calendar';
 import ReminderCard from '@/components/reminders/reminder-card';
 import { useProtectedRoute } from '@/hooks/auth';
 import useReminders from '@/hooks/use-reminders';
-import { getBeginningOfDay } from '@/util/time';
 import { fadeTransition } from '@/util/transition';
 
 function Reminders() {

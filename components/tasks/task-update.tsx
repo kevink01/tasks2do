@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import router from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { FaQuestionCircle, FaExclamation, FaCalendarCheck } from 'react-icons/fa';
 import { Alert, Button, Card, Container, Divider, Flex, Group, Stack, Text, TextInput, rem } from '@mantine/core';
@@ -22,14 +22,21 @@ type UpdateTaskProps = {
 
 export default function UpdateTask({ task, settings, promptDeleteTask, toggleEditMode }: UpdateTaskProps) {
 	const { updateTask } = useTasks();
-	const [date, setDate] = useState<Date | null>();
+	const [date, setDate] = useState<Date | null>(getDate(task.complete));
+	const router = useRouter();
 
 	const {
 		getValues,
 		setValue,
 		register,
 		formState: { errors },
-	} = useForm<TaskForm>();
+	} = useForm<TaskForm>({
+		defaultValues: {
+			name: task.name,
+			description: task.description,
+			complete: getDate(task.complete),
+		},
+	});
 
 	const promptUpdateTask = () => {
 		const formValues = getValues();
