@@ -33,11 +33,14 @@ function TaskCreate() {
 
 	const submit = () => {
 		if (!date) {
-			setError('complete', { message: 'Please enter a date', type: 'required' });
+			setError('dueDate', { message: 'Please enter a date', type: 'required' });
 			return;
 		}
-		register('complete', { value: date });
+		register('dueDate', { value: date });
+		register('isCompleted', { value: false });
+		register('completedDate', { value: null });
 		const parsed = parse<TaskForm>(taskFormSchema, getValues());
+		console.log(parsed);
 		if (parsed.success) {
 			const id = notify(
 				`create-task-${parsed.data.name}`,
@@ -48,6 +51,7 @@ function TaskCreate() {
 				'info'
 			);
 			const result = createTask(parsed.data);
+			console.log(result);
 			if (result.success) {
 				updateNotification(
 					id,
@@ -119,9 +123,9 @@ function TaskCreate() {
 							firstDayOfWeek={0}
 							onChange={(e) => {
 								setDate(e);
-								clearErrors('complete');
+								clearErrors('dueDate');
 							}}
-							error={errors.complete?.message}
+							error={errors.dueDate?.message}
 						/>
 					</Stack>
 					<Center mt={rem(10)}>

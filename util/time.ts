@@ -81,21 +81,32 @@ export function getColor(days: DayJSRemaining | null): 'red' | 'orange' | 'yello
 	return 'green';
 }
 
+export function daysDifference(timestamp1: FirebaseTimestamp, timestamp2: FirebaseTimestamp) {
+	const date1 = dayjs(getDate(timestamp1));
+	const date2 = dayjs(getDate(timestamp2));
+
+	return difference(date1, date2);
+}
+
 /**
  * Returns a formatted string that notes how much time to a given date
  * @param timestamp The firebase timestamp (includes seconds & nanoseconds)
  * @returns Object containing: past the date, value & unit of measurement, message, and "severity" (how close/past is the date)
  */
-export function daysRemaining(timestamp: FirebaseTimestamp) {
-	const date = getDate(timestamp).valueOf();
+export function daysRemaining(timestamp: FirebaseTimestamp): DayJSRemaining {
+	const date = getDate(timestamp);
 	const currentDate = dayjs();
-
 	const dayJSDate = dayjs(date);
-	const diff = dayJSDate.diff(currentDate, 'd', true);
+
+	return difference(dayJSDate, currentDate);
+}
+
+function difference(date1: dayjs.Dayjs, date2: dayjs.Dayjs): DayJSRemaining {
+	const diff = date1.diff(date2, 'd', true);
 	const absDiff = Math.abs(diff);
 
 	let returnValues: DayJSRemaining = {
-		overdue: currentDate.isAfter(dayJSDate),
+		overdue: date2.isAfter(date1),
 		message: '',
 		unit: 'day',
 		value: 1,
@@ -104,7 +115,7 @@ export function daysRemaining(timestamp: FirebaseTimestamp) {
 
 	switch (true) {
 		case absDiff < MINUTES: {
-			const units = dayJSDate.diff(undefined, 'minutes', true);
+			const units = date1.diff(date2, 'minutes', true);
 			returnValues.value = units;
 			returnValues.unit = 'minute';
 			returnValues.message = `${Math.abs(Math.floor(units))} ${Math.abs(units) < 2 ? 'minute' : 'minutes'} ${
@@ -114,9 +125,9 @@ export function daysRemaining(timestamp: FirebaseTimestamp) {
 			break;
 		}
 		case absDiff < HOURS: {
-			let units = dayJSDate.diff(undefined, 'hours', true);
+			let units = date1.diff(date2, 'hours', true);
 			if (Math.abs(units) < 2) {
-				units = dayJSDate.diff(undefined, 'minutes', true);
+				units = date1.diff(date2, 'minutes', true);
 				returnValues.unit = 'minute';
 				returnValues.severity = 'danger';
 			} else {
@@ -134,9 +145,9 @@ export function daysRemaining(timestamp: FirebaseTimestamp) {
 			break;
 		}
 		case absDiff < DAYS: {
-			let units = dayJSDate.diff(undefined, 'days', true);
+			let units = date1.diff(date2, 'days', true);
 			if (Math.abs(units) < 2) {
-				units = dayJSDate.diff(undefined, 'hours', true);
+				units = date1.diff(date2, 'hours', true);
 				returnValues.unit = 'hour';
 				if (units <= 48) {
 					returnValues.severity = 'danger';
@@ -158,9 +169,9 @@ export function daysRemaining(timestamp: FirebaseTimestamp) {
 			break;
 		}
 		case absDiff < WEEKS: {
-			let units = dayJSDate.diff(undefined, 'weeks', true);
+			let units = date1.diff(date2, 'weeks', true);
 			if (Math.abs(units) < 2) {
-				units = dayJSDate.diff(undefined, 'days', true);
+				units = date1.diff(date2, 'days', true);
 				returnValues.unit = 'day';
 				if (units <= 2) {
 					returnValues.severity = 'danger';
@@ -178,9 +189,9 @@ export function daysRemaining(timestamp: FirebaseTimestamp) {
 			break;
 		}
 		case absDiff < MONTHS: {
-			let units = dayJSDate.diff(undefined, 'months', true);
+			let units = date1.diff(date2, 'months', true);
 			if (Math.abs(units) < 2) {
-				units = dayJSDate.diff(undefined, 'weeks', true);
+				units = date1.diff(date2, 'weeks', true);
 				returnValues.unit = 'week';
 			} else {
 				returnValues.unit = 'month';
@@ -193,9 +204,9 @@ export function daysRemaining(timestamp: FirebaseTimestamp) {
 			break;
 		}
 		default: {
-			let units = dayJSDate.diff(undefined, 'years', true);
+			let units = date1.diff(date2, 'years', true);
 			if (Math.abs(units) < 2) {
-				units = dayJSDate.diff(undefined, 'months', true);
+				units = date1.diff(date2, 'months', true);
 				returnValues.unit = 'month';
 			} else {
 				returnValues.unit = 'year';

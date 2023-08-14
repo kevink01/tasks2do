@@ -10,12 +10,14 @@ import NoTasks from '@/components/tasks/no-tasks';
 import TaskCard from '@/components/tasks/task-card';
 import TaskCalender from '@/components/tasks/task-calendar';
 import { useProtectedRoute } from '@/hooks/auth';
+import { useSettings } from '@/hooks/use-settings';
 import { useTasks } from '@/hooks/use-tasks';
 import { fadeTransition } from '@/util/transition';
 
 function Tasks() {
 	useProtectedRoute();
 	const { tasks } = useTasks();
+	const { settings, loading } = useSettings();
 
 	const [calendarMode, setCalenderMode] = useState<boolean>(false);
 	const [transition, setTransition] = useState<boolean>(false);
@@ -52,7 +54,7 @@ function Tasks() {
 					<Accordion.Panel>Description</Accordion.Panel>
 				</Accordion.Item>
 			</Accordion>
-			{!tasks ? (
+			{!tasks || !settings || loading ? (
 				<GridLoader />
 			) : tasks.length === 0 ? (
 				<NoTasks />
@@ -61,11 +63,11 @@ function Tasks() {
 					{(styles) => (
 						<div style={styles}>
 							{calendarMode ? (
-								<TaskCalender tasks={tasks} />
+								<TaskCalender tasks={tasks} settings={settings} />
 							) : (
 								<Grid gutter={5}>
 									{tasks.map((task) => {
-										return <TaskCard key={task.id} task={task} />;
+										return <TaskCard key={task.id} task={task} settings={settings} />;
 									})}
 								</Grid>
 							)}

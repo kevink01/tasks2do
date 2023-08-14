@@ -1,4 +1,4 @@
-import { Button, Card, Divider, Flex, Group, Text, rem } from '@mantine/core';
+import { Button, Card, Divider, Flex, Group, Space, Text, rem } from '@mantine/core';
 import { TaskFetch } from '@/types/task';
 import { convertToTimestamp, daysRemaining, getColor } from '@/util/time';
 
@@ -10,7 +10,7 @@ type TaskViewProps = {
 };
 
 export default function TaskView({ task, promptDeleteTask, toggleEditMode }: TaskViewProps) {
-	const days = daysRemaining(task.complete);
+	const days = daysRemaining(task.dueDate);
 	return (
 		<div>
 			<Text className='absolute right-2'>id: {task.id}</Text>
@@ -26,25 +26,39 @@ export default function TaskView({ task, promptDeleteTask, toggleEditMode }: Tas
 					</Flex>
 				</Flex>
 			</Card.Section>
+			<Space h={rem(4)} />
 			<Card.Section ml={rem(4)} pt={rem(4)}>
 				<Flex direction='column'>
-					<Text size='sm'>Complete on</Text>
+					<Text size='sm'>Due date</Text>
 					<Group>
-						<Text size='md'>{convertToTimestamp(task.complete)}</Text>
-						<Text color={getColor(days)}>{`(${days.message})`}</Text>
+						<Text size='md'>{convertToTimestamp(task.dueDate)}</Text>
+						{!task.isCompleted && <Text color={getColor(days)} size='md'>{`(${days.message})`}</Text>}
 					</Group>
 				</Flex>
+			</Card.Section>
+			<Space h={rem(4)} />
+			<Card.Section ml={rem(4)} pt={rem(4)}>
+				<Group grow spacing='xs'>
+					<Flex direction='column'>
+						<Text size='sm'>Is completed</Text>
+						<Text size='md'>{task.isCompleted ? 'Yes' : 'No'}</Text>
+					</Flex>
+					<Flex direction='column'>
+						<Text size='sm'>Completed Date</Text>
+						{task.completedDate && <Text size='md'>{convertToTimestamp(task.completedDate)}</Text>}
+					</Flex>
+				</Group>
 			</Card.Section>
 			<Divider my='md' />
 			<Card.Section ml={rem(4)} pt={rem(4)}>
 				<Group grow spacing='xs'>
 					<Flex direction='column'>
 						<Text size='xs'>Task created</Text>
-						<Text size='sm'>{convertToTimestamp(task.created)}</Text>
+						<Text size='sm'>{convertToTimestamp(task.createdAt)}</Text>
 					</Flex>
 					<Flex direction='column'>
 						<Text size='xs'>Last updated</Text>
-						<Text size='sm'>{convertToTimestamp(task.updated)}</Text>
+						<Text size='sm'>{convertToTimestamp(task.updatedAt)}</Text>
 					</Flex>
 				</Group>
 			</Card.Section>

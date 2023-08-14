@@ -11,6 +11,7 @@ type TasksInstance = {
 	tasks: TaskFetch[] | null;
 	createTask: (task: TaskForm) => FirebaseResult<Task>;
 	updateTask: (oldTask: TaskFetch, taskForm: TaskForm) => FirebaseResult<Task>;
+	markComplete: (task: TaskFetch, checked: boolean) => FirebaseResult<Task>;
 	deleteTask: (task: TaskFetch) => FirebaseResult<undefined>;
 };
 
@@ -24,7 +25,7 @@ export function useTasks(): TasksInstance {
 		if (user) {
 			const id = uuid();
 			const now = new Date();
-			const parsed = parse<Task>(taskSchema, { ...task, id: id, created: now, updated: now });
+			const parsed = parse<Task>(taskSchema, { ...task, id: id, createdAt: now, updatedAt: now });
 			if (parsed.success) {
 				setDoc(doc(getFirestore(), `/users/${user.uid}/tasks/${parsed.data.id}`), parsed.data);
 				return { success: true, data: parsed.data };
@@ -41,8 +42,9 @@ export function useTasks(): TasksInstance {
 			const parsed = parse<Task>(taskSchema, {
 				...oldTask,
 				...taskForm,
-				created: getDate(oldTask.created),
-				updated: now,
+				completedDate: taskForm.isCompleted ? now : null,
+				createdAt: getDate(oldTask.createdAt),
+				updatedAt: now,
 			});
 			if (parsed.success) {
 				setDoc(doc(getFirestore(), `/users/${user.uid}/tasks/${oldTask.id}`), parsed.data);
@@ -50,6 +52,19 @@ export function useTasks(): TasksInstance {
 			} else {
 				return { success: false, error: 'Parsed data was not successful' };
 			}
+		}
+		return { success: false, error: 'User not logged in' };
+	}
+
+	function markComplete(task: TaskFetch, checked: boolean): FirebaseResult<Task> {
+		if (user) {
+			const formValues: TaskForm = {
+				...task,
+				isCompleted: checked,
+				dueDate: getDate(task.dueDate),
+				completedDate: checked ? new Date() : null,
+			};
+			return updateTask(task, formValues);
 		}
 		return { success: false, error: 'User not logged in' };
 	}
@@ -67,5 +82,5 @@ export function useTasks(): TasksInstance {
 		return { success: false, error: 'User not logged in' };
 	}
 
-	return { tasks, createTask, updateTask, deleteTask };
+	return { tasks, createTask, updateTask, markComplete, deleteTask };
 }

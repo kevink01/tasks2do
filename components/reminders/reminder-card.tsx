@@ -56,7 +56,7 @@ export default function ReminderCard({ reminder }: ReminderCardProps) {
 	return (
 		<Grid.Col span={4} key={reminder.id}>
 			<Card shadow='sm' padding='sm' radius='md' withBorder className='hover:cursor-pointer'>
-				<Card.Section ml={rem(4)}>
+				<Card.Section mx={rem(4)}>
 					<CustomLink href={`/reminders/${reminder.id}`}>
 						<Text size='xl' td='underline'>
 							{reminder.name}
@@ -81,7 +81,7 @@ export default function ReminderCard({ reminder }: ReminderCardProps) {
 						<Text color={getColor(date)}>{`(${date.message})`}</Text>
 					</Text>
 				</Card.Section>
-				<Card.Section ml={rem(4)} mt={rem(4)} mb={rem(4)}>
+				<Card.Section mx={rem(4)} mt={rem(4)} mb={rem(4)}>
 					<Box sx={{ display: 'flex', gap: rem(4) }}>
 						<CustomLink href={`/reminders/${reminder.id}?edit=true`}>
 							<Button color='orange' leftIcon={<FaPen />}>
@@ -94,7 +94,7 @@ export default function ReminderCard({ reminder }: ReminderCardProps) {
 						</Button>
 					</Box>
 				</Card.Section>
-				<Card.Section ml={rem(4)} pb={rem(4)}>
+				<Card.Section mx={rem(4)} pb={rem(4)}>
 					<Text fz='sm' display='flex' sx={{ gap: rem(4) }}>
 						<Text fs='italic'>Created on:</Text>
 						<Text>{convertToTimestamp(reminder.created)}</Text>

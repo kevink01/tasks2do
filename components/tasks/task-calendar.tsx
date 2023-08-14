@@ -3,6 +3,7 @@ import { Accordion, Button, Center, Container, Group, Indicator, Space, Stack, T
 import { Calendar } from '@mantine/dates';
 import dayjs from 'dayjs';
 
+import { Settings } from '@/types/settings';
 import { TaskFetch } from '@/types/task';
 import { getBeginningOfDay } from '@/util/time';
 import { scaleTransition } from '@/util/transition';
@@ -16,22 +17,23 @@ type DateTasks = {
 
 type TaskCalendarProps = {
 	tasks: TaskFetch[];
+	settings: Settings;
 };
 
 function filterTasks(tasks: TaskFetch[], date: Date): TaskFetch[] {
 	return tasks
-		.filter((task) => getBeginningOfDay(task.complete).valueOf() === date.valueOf())
+		.filter((task) => getBeginningOfDay(task.dueDate).valueOf() === date.valueOf())
 		.sort((task1, task2) => {
-			const task1Time = task1.complete.seconds + task1.complete.nanoseconds / 1000000;
-			const task2Time = task2.complete.seconds + task2.complete.nanoseconds / 1000000;
+			const task1Time = task1.dueDate.seconds + task1.dueDate.nanoseconds / 1000000;
+			const task2Time = task2.dueDate.seconds + task2.dueDate.nanoseconds / 1000000;
 			return task1Time - task2Time || task1.name > task2.name ? 1 : task1.name < task2.name ? -1 : 0;
 		});
 }
 
-function TaskCalender({ tasks }: TaskCalendarProps) {
+function TaskCalender({ tasks, settings }: TaskCalendarProps) {
 	const today = dayjs(Date.now());
 	const days = tasks.map((task) => {
-		return getBeginningOfDay(task.complete).valueOf();
+		return getBeginningOfDay(task.dueDate).valueOf();
 	});
 	const [dateTasks, setDateTasks] = useState<DateTasks>({
 		date: null,
@@ -44,7 +46,9 @@ function TaskCalender({ tasks }: TaskCalendarProps) {
 	const handleSelectDate = (date: Date) => {
 		if (dateTasks.date && dateTasks.date.valueOf() === date.valueOf()) {
 			setOpen((mode) => !mode);
-			setDateTasks({ tasks: [], date: null });
+			setTimeout(() => {
+				setDateTasks({ tasks: [], date: null });
+			}, 200);
 		} else {
 			if (tasks) {
 				const filteredTasks = filterTasks(tasks, date);
@@ -97,7 +101,7 @@ function TaskCalender({ tasks }: TaskCalendarProps) {
 						renderDay={(date) => {
 							if (Math.floor(dayjs(dateTasks.date).diff(date, 'd', true)) === 0) {
 								return (
-									<Indicator color={days.includes(date.valueOf()) ? 'red' : 'blue'} offset={-2}>
+									<Indicator color={'blue'} offset={-2}>
 										<div>{date.getDate()}</div>
 									</Indicator>
 								);
@@ -154,7 +158,7 @@ function TaskCalender({ tasks }: TaskCalendarProps) {
 							) : (
 								<Stack spacing='xs' align='left'>
 									{dateTasks.tasks.map((task) => {
-										return <TaskInfo task={task} key={task.id} />;
+										return <TaskInfo task={task} key={task.id} settings={settings} />;
 									})}
 								</Stack>
 							)}

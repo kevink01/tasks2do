@@ -2,7 +2,20 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { FaQuestionCircle, FaExclamation, FaCalendarCheck } from 'react-icons/fa';
-import { Alert, Button, Card, Container, Divider, Flex, Group, Stack, Text, TextInput, rem } from '@mantine/core';
+import {
+	Alert,
+	Button,
+	Card,
+	Container,
+	Divider,
+	Flex,
+	Group,
+	Stack,
+	Switch,
+	Text,
+	TextInput,
+	rem,
+} from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { modals } from '@mantine/modals';
 
@@ -20,9 +33,19 @@ type UpdateTaskProps = {
 	toggleEditMode: (mode?: boolean) => void;
 };
 
+type UpdateTaskDates = {
+	dueDate: Date;
+	completedDate: Date | null;
+};
+
 export default function UpdateTask({ task, settings, promptDeleteTask, toggleEditMode }: UpdateTaskProps) {
 	const { updateTask } = useTasks();
-	const [date, setDate] = useState<Date | null>(getDate(task.complete));
+	const [dates, setDates] = useState<UpdateTaskDates>({
+		dueDate: getDate(task.dueDate),
+		completedDate: task.completedDate ? getDate(task.completedDate) : null,
+	});
+	const [completed, setCompleted] = useState<boolean>(task.isCompleted);
+
 	const router = useRouter();
 
 	const {
@@ -34,16 +57,31 @@ export default function UpdateTask({ task, settings, promptDeleteTask, toggleEdi
 		defaultValues: {
 			name: task.name,
 			description: task.description,
-			complete: getDate(task.complete),
+			dueDate: getDate(task.dueDate),
+			isCompleted: task.isCompleted,
+			completedDate: task.completedDate ? getDate(task.completedDate) : null,
 		},
 	});
+
+	const toggleCompleted = () => {
+		if (!completed) {
+			setDates({ ...dates, completedDate: task.completedDate ? getDate(task.completedDate) : new Date() });
+		}
+		setCompleted((checked) => !checked);
+	};
 
 	const promptUpdateTask = () => {
 		const formValues = getValues();
 		const noChanges =
 			task.name === formValues.name &&
 			task.description === formValues.description &&
-			getDate(task.complete).valueOf() === (date?.valueOf() ?? formValues.complete.valueOf());
+			task.isCompleted === formValues.isCompleted &&
+			getDate(task.dueDate).valueOf() === dates.dueDate.valueOf() &&
+			(task.completedDate
+				? dates.completedDate
+					? getDate(task.completedDate).valueOf() === dates.completedDate.valueOf()
+					: false
+				: dates.completedDate === null);
 		modals.openConfirmModal({
 			centered: true,
 			title: 'Updating task',
@@ -78,11 +116,31 @@ export default function UpdateTask({ task, settings, promptDeleteTask, toggleEdi
 								<Text>New value: {formValues.description}</Text>
 							</Stack>
 						)}
-						{getDate(task.complete).valueOf() !== (date?.valueOf() ?? formValues.complete.valueOf()) && (
+						{getDate(task.dueDate).valueOf() !== dates.dueDate.valueOf() && (
 							<Stack spacing='xs'>
-								<Text c='dimmed'>Complete date</Text>
-								<Text>Old value: {task ? getDate(task.complete).toLocaleString() : new Date().toLocaleString()}</Text>
-								<Text>New value: {date ? date.toLocaleString() : formValues.complete.toLocaleString()}</Text>
+								<Text c='dimmed'>Due date</Text>
+								<Text>Old value: {getDate(task.dueDate).toLocaleString()}</Text>
+								<Text>New value: {dates.dueDate.toLocaleString()}</Text>
+							</Stack>
+						)}
+						{task.isCompleted !== formValues.isCompleted && (
+							<Stack spacing='xs'>
+								<Text c='dimmed'>Is completed</Text>
+								<Text>Old value: {task.isCompleted ? 'Yes' : 'No'}</Text>
+								<Text>New value: {formValues.isCompleted ? 'Yes' : 'No'}</Text>
+							</Stack>
+						)}
+						{(task.completedDate
+							? dates.completedDate
+								? getDate(task.completedDate).valueOf() !== dates.completedDate.valueOf()
+								: true
+							: dates.completedDate !== null) && (
+							<Stack spacing='xs'>
+								<Text c='dimmed'>Completed date</Text>
+								{task.completedDate && <Text>Old value: {getDate(task.completedDate).toLocaleString()}</Text>}
+								{dates.completedDate && <Text>New value: {dates.completedDate.toLocaleString()}</Text>}
+								{!task.completedDate && <Text fs='italic'>(No previous date)</Text>}
+								{!dates.completedDate && <Text fs='iatlic'>(No more completion date)</Text>}
 							</Stack>
 						)}
 					</Stack>
@@ -91,7 +149,9 @@ export default function UpdateTask({ task, settings, promptDeleteTask, toggleEdi
 			labels: { confirm: 'Confirm', cancel: 'Cancel' },
 			confirmProps: { color: 'green', disabled: noChanges },
 			onConfirm: () => {
-				date && setValue('complete', date);
+				setValue('isCompleted', completed);
+				setValue('dueDate', dates.dueDate);
+				setValue('completedDate', completed ? (task.completedDate ? dates.completedDate : new Date()) : null);
 				const id = notify(
 					`update-task-${task.id}`,
 					`Updating task: ${task.name}`,
@@ -107,6 +167,39 @@ export default function UpdateTask({ task, settings, promptDeleteTask, toggleEdi
 				} else {
 					updateNotification(id, 'Error!', 'Unable to update task', settings, 'error');
 				}
+			},
+		});
+	};
+
+	const promptResetChanges = () => {
+		modals.openConfirmModal({
+			centered: true,
+			title: 'Resetting changes',
+			children: (
+				<Container>
+					<Alert
+						icon={<FaExclamation />}
+						title='Are you sure you want to reset?'
+						color='yellow'
+						radius='xs'
+						mb={rem(4)}>
+						This action cannot be undone
+					</Alert>
+				</Container>
+			),
+			labels: { confirm: 'Confirm', cancel: 'Cancel' },
+			confirmProps: { color: 'green' },
+			onConfirm: () => {
+				setValue('name', task.name);
+				setValue('description', task.description);
+				setValue('isCompleted', task.isCompleted);
+				setCompleted(task.isCompleted);
+				setValue('dueDate', getDate(task.dueDate));
+				setValue('completedDate', task.completedDate ? getDate(task.completedDate) : null);
+				setDates({
+					dueDate: getDate(task.dueDate),
+					completedDate: task.completedDate ? getDate(task.completedDate) : null,
+				});
 			},
 		});
 	};
@@ -132,9 +225,17 @@ export default function UpdateTask({ task, settings, promptDeleteTask, toggleEdi
 			onConfirm: () => {
 				setValue('name', task.name);
 				setValue('description', task.description);
-				const resetDate = getDate(task.complete);
-				setValue('complete', resetDate);
-				setDate(resetDate);
+				setValue('isCompleted', task.isCompleted);
+				const resetDates: UpdateTaskDates = {
+					dueDate: getDate(task.dueDate),
+					completedDate: task.completedDate ? getDate(task.completedDate) : null,
+				};
+				setValue('dueDate', resetDates.dueDate);
+				setValue('completedDate', resetDates.completedDate);
+				setDates({
+					dueDate: resetDates.dueDate,
+					completedDate: resetDates.completedDate,
+				});
 				toggleEditMode(false);
 			},
 		});
@@ -142,7 +243,7 @@ export default function UpdateTask({ task, settings, promptDeleteTask, toggleEdi
 
 	return (
 		<div>
-			<Card.Section ml={rem(4)} pt={rem(4)}>
+			<Card.Section mx={rem(4)} pt={rem(4)}>
 				<Flex direction='column' gap='xs'>
 					<TextInput
 						placeholder='Task name'
@@ -168,9 +269,9 @@ export default function UpdateTask({ task, settings, promptDeleteTask, toggleEdi
 					/>
 				</Flex>
 			</Card.Section>
-			<Card.Section ml={rem(4)} pt={rem(4)}>
+			<Card.Section mx={rem(4)} pt={rem(4)}>
 				<DateTimePicker
-					label='Completion date'
+					label='Due date'
 					placeholder='Pick date and time'
 					withAsterisk
 					dropdownType='modal'
@@ -179,16 +280,55 @@ export default function UpdateTask({ task, settings, promptDeleteTask, toggleEdi
 					minDate={new Date()}
 					firstDayOfWeek={0}
 					onChange={(e) => {
-						setDate(e);
+						if (e) {
+							setDates({ dueDate: new Date(e.valueOf()), completedDate: dates.completedDate });
+						}
 					}}
-					defaultValue={getDate(task.complete)}
+					defaultValue={getDate(task.dueDate)}
 				/>
 			</Card.Section>
 			<Divider my='sm' />
-			<Card.Section ml={rem(4)} pt={rem(4)} pb={rem(10)}>
+			<Card.Section mx={rem(4)} pt={rem(4)}>
+				<Group grow spacing='xs'>
+					<Stack spacing={0}>
+						<Group spacing={5}>
+							<Text size='sm' color='white'>
+								Task completed
+							</Text>
+							<Text color='red'>*</Text>
+						</Group>
+						<Switch checked={completed} onClick={toggleCompleted} />
+					</Stack>
+					<DateTimePicker
+						label='Completion date'
+						withAsterisk
+						dropdownType='modal'
+						modalProps={{ centered: true }}
+						valueFormat='MM/DD/YYYY hh:mm A'
+						firstDayOfWeek={0}
+						disabled={completed && task.completedDate !== null}
+						value={dates.completedDate}
+						clearable
+						clearButtonProps={{
+							onClick: () => {
+								if (completed) {
+									setCompleted(false);
+								}
+								setDates({ ...dates, completedDate: null });
+								console.log(dates);
+							},
+						}}
+					/>
+				</Group>
+			</Card.Section>
+			<Divider my='sm' />
+			<Card.Section mx={rem(4)} pt={rem(4)} pb={rem(10)}>
 				<Group spacing='sm'>
 					<Button color='green' onClick={promptUpdateTask}>
 						Confirm changes
+					</Button>
+					<Button color='blue' onClick={promptResetChanges}>
+						Reset changes
 					</Button>
 					<Button color='yellow' onClick={promptCancelChanges}>
 						Discard changes
