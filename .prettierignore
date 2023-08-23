@@ -13,3 +13,7 @@ pnpm-lock.yaml
 # Configure files
 .turbo
 .husky
+
+# Ignore files
+.gitignore
+.prettierignore

@@ -17,7 +17,7 @@ import {
 } from '@mantine/core';
 import ProfileMenu from './menu/profile';
 import ThemeMenu from './menu/theme';
-import t2d from '@/public/task2DoLogo-RemovedBG.png';
+// import t2d from '@/public/task2DoLogo-RemovedBG.png';
 import { modals } from '@mantine/modals';
 import { FaExclamation } from 'react-icons/fa';
 
@@ -84,7 +84,8 @@ function Navigation() {
 							router.push('/');
 						}}
 						my={rem(12)}>
-						<Image src={t2d.src} alt='Logo' width={t2d.width} height={t2d.height} className='bg-white rounded-full' />
+						{/*<Image src={t2d.src} alt='Logo' width={t2d.width} height={t2d.height} className='bg-white rounded-full' />*/}
+						<div>Image placeholder</div>
 					</ActionIcon>
 					<Text
 						variant='gradient'
