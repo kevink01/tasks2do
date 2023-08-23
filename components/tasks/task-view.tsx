@@ -45,7 +45,7 @@ export default function TaskView({ task, promptDeleteTask, toggleEditMode }: Tas
 					</Flex>
 					<Flex direction='column'>
 						<Text size='sm'>Completed Date</Text>
-						{task.completedDate && <Text size='md'>{convertToTimestamp(task.completedDate)}</Text>}
+						{task.completedAt && <Text size='md'>{convertToTimestamp(task.completedAt)}</Text>}
 					</Flex>
 				</Group>
 			</Card.Section>

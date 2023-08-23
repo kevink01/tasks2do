@@ -57,9 +57,7 @@ function TaskCard({ task, settings }: TaskCardProps) {
 	};
 
 	const date =
-		task.isCompleted && task.completedDate
-			? daysDifference(task.dueDate, task.completedDate)
-			: daysRemaining(task.dueDate);
+		task.isCompleted && task.completedAt ? daysDifference(task.dueDate, task.completedAt) : daysRemaining(task.dueDate);
 	return (
 		<Grid.Col span={4} key={task.id}>
 			<Card shadow='sm' padding='sm' radius='md' withBorder className='hover:cursor-pointer'>
@@ -91,7 +89,7 @@ function TaskCard({ task, settings }: TaskCardProps) {
 						{task.isCompleted ? (
 							<>
 								<Text fs='italic'>Completed on:</Text>
-								<Text>{task.completedDate && convertToTimestamp(task.completedDate)}</Text>
+								<Text>{task.completedAt && convertToTimestamp(task.completedAt)}</Text>
 							</>
 						) : (
 							<Text color={getColor(date)}>{`(${date.message})`}</Text>

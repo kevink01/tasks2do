@@ -42,7 +42,7 @@ export function useTasks(): TasksInstance {
 			const parsed = parse<Task>(taskSchema, {
 				...oldTask,
 				...taskForm,
-				completedDate: taskForm.isCompleted ? now : null,
+				completedAt: taskForm.isCompleted ? now : null,
 				createdAt: getDate(oldTask.createdAt),
 				updatedAt: now,
 			});
@@ -62,7 +62,7 @@ export function useTasks(): TasksInstance {
 				...task,
 				isCompleted: checked,
 				dueDate: getDate(task.dueDate),
-				completedDate: checked ? new Date() : null,
+				completedAt: checked ? new Date() : null,
 			};
 			return updateTask(task, formValues);
 		}

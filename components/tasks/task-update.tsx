@@ -35,14 +35,14 @@ type UpdateTaskProps = {
 
 type UpdateTaskDates = {
 	dueDate: Date;
-	completedDate: Date | null;
+	completedAt: Date | null;
 };
 
 export default function UpdateTask({ task, settings, promptDeleteTask, toggleEditMode }: UpdateTaskProps) {
 	const { updateTask } = useTasks();
 	const [dates, setDates] = useState<UpdateTaskDates>({
 		dueDate: getDate(task.dueDate),
-		completedDate: task.completedDate ? getDate(task.completedDate) : null,
+		completedAt: task.completedAt ? getDate(task.completedAt) : null,
 	});
 	const [completed, setCompleted] = useState<boolean>(task.isCompleted);
 
@@ -59,13 +59,13 @@ export default function UpdateTask({ task, settings, promptDeleteTask, toggleEdi
 			description: task.description,
 			dueDate: getDate(task.dueDate),
 			isCompleted: task.isCompleted,
-			completedDate: task.completedDate ? getDate(task.completedDate) : null,
+			completedAt: task.completedAt ? getDate(task.completedAt) : null,
 		},
 	});
 
 	const toggleCompleted = () => {
 		if (!completed) {
-			setDates({ ...dates, completedDate: task.completedDate ? getDate(task.completedDate) : new Date() });
+			setDates({ ...dates, completedAt: task.completedAt ? getDate(task.completedAt) : new Date() });
 		}
 		setCompleted((checked) => !checked);
 	};
@@ -77,11 +77,11 @@ export default function UpdateTask({ task, settings, promptDeleteTask, toggleEdi
 			task.description === formValues.description &&
 			task.isCompleted === formValues.isCompleted &&
 			getDate(task.dueDate).valueOf() === dates.dueDate.valueOf() &&
-			(task.completedDate
-				? dates.completedDate
-					? getDate(task.completedDate).valueOf() === dates.completedDate.valueOf()
+			(task.completedAt
+				? dates.completedAt
+					? getDate(task.completedAt).valueOf() === dates.completedAt.valueOf()
 					: false
-				: dates.completedDate === null);
+				: dates.completedAt === null);
 		modals.openConfirmModal({
 			centered: true,
 			title: 'Updating task',
@@ -130,17 +130,17 @@ export default function UpdateTask({ task, settings, promptDeleteTask, toggleEdi
 								<Text>New value: {formValues.isCompleted ? 'Yes' : 'No'}</Text>
 							</Stack>
 						)}
-						{(task.completedDate
-							? dates.completedDate
-								? getDate(task.completedDate).valueOf() !== dates.completedDate.valueOf()
+						{(task.completedAt
+							? dates.completedAt
+								? getDate(task.completedAt).valueOf() !== dates.completedAt.valueOf()
 								: true
-							: dates.completedDate !== null) && (
+							: dates.completedAt !== null) && (
 							<Stack spacing='xs'>
 								<Text c='dimmed'>Completed date</Text>
-								{task.completedDate && <Text>Old value: {getDate(task.completedDate).toLocaleString()}</Text>}
-								{dates.completedDate && <Text>New value: {dates.completedDate.toLocaleString()}</Text>}
-								{!task.completedDate && <Text fs='italic'>(No previous date)</Text>}
-								{!dates.completedDate && <Text fs='iatlic'>(No more completion date)</Text>}
+								{task.completedAt && <Text>Old value: {getDate(task.completedAt).toLocaleString()}</Text>}
+								{dates.completedAt && <Text>New value: {dates.completedAt.toLocaleString()}</Text>}
+								{!task.completedAt && <Text fs='italic'>(No previous date)</Text>}
+								{!dates.completedAt && <Text fs='iatlic'>(No more completion date)</Text>}
 							</Stack>
 						)}
 					</Stack>
@@ -151,7 +151,7 @@ export default function UpdateTask({ task, settings, promptDeleteTask, toggleEdi
 			onConfirm: () => {
 				setValue('isCompleted', completed);
 				setValue('dueDate', dates.dueDate);
-				setValue('completedDate', completed ? (task.completedDate ? dates.completedDate : new Date()) : null);
+				setValue('completedAt', completed ? (task.completedAt ? dates.completedAt : new Date()) : null);
 				const id = notify(
 					`update-task-${task.id}`,
 					`Updating task: ${task.name}`,
@@ -195,10 +195,10 @@ export default function UpdateTask({ task, settings, promptDeleteTask, toggleEdi
 				setValue('isCompleted', task.isCompleted);
 				setCompleted(task.isCompleted);
 				setValue('dueDate', getDate(task.dueDate));
-				setValue('completedDate', task.completedDate ? getDate(task.completedDate) : null);
+				setValue('completedAt', task.completedAt ? getDate(task.completedAt) : null);
 				setDates({
 					dueDate: getDate(task.dueDate),
-					completedDate: task.completedDate ? getDate(task.completedDate) : null,
+					completedAt: task.completedAt ? getDate(task.completedAt) : null,
 				});
 			},
 		});
@@ -228,13 +228,13 @@ export default function UpdateTask({ task, settings, promptDeleteTask, toggleEdi
 				setValue('isCompleted', task.isCompleted);
 				const resetDates: UpdateTaskDates = {
 					dueDate: getDate(task.dueDate),
-					completedDate: task.completedDate ? getDate(task.completedDate) : null,
+					completedAt: task.completedAt ? getDate(task.completedAt) : null,
 				};
 				setValue('dueDate', resetDates.dueDate);
-				setValue('completedDate', resetDates.completedDate);
+				setValue('completedAt', resetDates.completedAt);
 				setDates({
 					dueDate: resetDates.dueDate,
-					completedDate: resetDates.completedDate,
+					completedAt: resetDates.completedAt,
 				});
 				toggleEditMode(false);
 			},
@@ -281,7 +281,7 @@ export default function UpdateTask({ task, settings, promptDeleteTask, toggleEdi
 					firstDayOfWeek={0}
 					onChange={(e) => {
 						if (e) {
-							setDates({ dueDate: new Date(e.valueOf()), completedDate: dates.completedDate });
+							setDates({ dueDate: new Date(e.valueOf()), completedAt: dates.completedAt });
 						}
 					}}
 					defaultValue={getDate(task.dueDate)}
@@ -306,15 +306,15 @@ export default function UpdateTask({ task, settings, promptDeleteTask, toggleEdi
 						modalProps={{ centered: true }}
 						valueFormat='MM/DD/YYYY hh:mm A'
 						firstDayOfWeek={0}
-						disabled={completed && task.completedDate !== null}
-						value={dates.completedDate}
+						disabled={completed && task.completedAt !== null}
+						value={dates.completedAt}
 						clearable
 						clearButtonProps={{
 							onClick: () => {
 								if (completed) {
 									setCompleted(false);
 								}
-								setDates({ ...dates, completedDate: null });
+								setDates({ ...dates, completedAt: null });
 								console.log(dates);
 							},
 						}}

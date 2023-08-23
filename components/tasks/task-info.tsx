@@ -20,8 +20,8 @@ function TaskInfo({ task, settings }: TaskInfoProps) {
 			notify(`check-task-${task.id}-${Date.now()}`, 'Error!', 'Unable to complete task', false, settings, 'error');
 		} else {
 			task.isCompleted = result.data.isCompleted;
-			task.completedDate = result.data.completedDate
-				? { seconds: result.data.completedDate.getTime() / 1000, nanoseconds: 0 }
+			task.completedAt = result.data.completedAt
+				? { seconds: result.data.completedAt.getTime() / 1000, nanoseconds: 0 }
 				: null;
 		}
 	};
@@ -56,7 +56,7 @@ function TaskInfo({ task, settings }: TaskInfoProps) {
 						{task.isCompleted && (
 							<Group spacing={rem(10)}>
 								<Text fs='italic'>Completed on: </Text>
-								<Text>{task.completedDate && convertToTimestamp(task.completedDate)}</Text>
+								<Text>{task.completedAt && convertToTimestamp(task.completedAt)}</Text>
 							</Group>
 						)}
 					</Group>

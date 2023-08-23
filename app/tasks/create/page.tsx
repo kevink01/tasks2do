@@ -38,7 +38,7 @@ function TaskCreate() {
 		}
 		register('dueDate', { value: date });
 		register('isCompleted', { value: false });
-		register('completedDate', { value: null });
+		register('completedAt', { value: null });
 		const parsed = parse<TaskForm>(taskFormSchema, getValues());
 		console.log(parsed);
 		if (parsed.success) {
