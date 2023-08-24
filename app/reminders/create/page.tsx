@@ -60,7 +60,6 @@ export default function ReminderCreate() {
 		register('isCompleted', { value: false });
 		register('completedAt', { value: null });
 		const parsed = parse<ReminderForm>(reminderFormSchema, getValues());
-		console.log(parsed);
 		if (parsed.success) {
 			const id = notify(
 				`create-reminder-${parsed.data.name}`,

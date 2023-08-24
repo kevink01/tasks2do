@@ -40,7 +40,6 @@ function TaskCreate() {
 		register('isCompleted', { value: false });
 		register('completedAt', { value: null });
 		const parsed = parse<TaskForm>(taskFormSchema, getValues());
-		console.log(parsed);
 		if (parsed.success) {
 			const id = notify(
 				`create-task-${parsed.data.name}`,
@@ -51,7 +50,6 @@ function TaskCreate() {
 				'info'
 			);
 			const result = createTask(parsed.data);
-			console.log(result);
 			if (result.success) {
 				updateNotification(
 					id,
