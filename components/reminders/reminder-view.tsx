@@ -11,7 +11,7 @@ type ReminderViewProps = {
 };
 
 export default function ReminderView({ reminder, promptDeleteReminder, toggleEditMode }: ReminderViewProps) {
-	const days = daysRemaining(reminder.complete);
+	const days = daysRemaining(reminder.dueDate);
 	return (
 		<div>
 			<Text className='absolute right-2'>id: {reminder.id}</Text>
@@ -30,16 +30,30 @@ export default function ReminderView({ reminder, promptDeleteReminder, toggleEdi
 			<Card.Section ml={rem(4)} pt={rem(4)}>
 				<Group grow spacing='xs'>
 					<Flex direction='column'>
-						<Text size='sm'>Complete on</Text>
+						<Text size='sm'>Due date</Text>
 						<Group>
-							<Text size='md'>{convertToDay(reminder.complete, reminder.allDay)}</Text>
-							<Text color={getColor(days)}>{`(${days.message})`}</Text>
+							<Text size='md'>{convertToDay(reminder.dueDate, reminder.allDay)}</Text>
+							{!reminder.isCompleted && <Text color={getColor(days)}>{`(${days.message})`}</Text>}
 						</Group>
 					</Flex>
 					<Flex direction='column'>
 						<Text size='sm'>All Day</Text>
-						<Text>{reminder.allDay ? 'true' : 'false'}</Text>
+						<Text>{reminder.allDay ? 'Yes' : 'No'}</Text>
 					</Flex>
+				</Group>
+			</Card.Section>
+			<Card.Section ml={rem(4)} pt={rem(4)}>
+				<Group grow spacing='xs'>
+					<Flex direction='column'>
+						<Text size='sm'>Is completed</Text>
+						<Text size='md'>{reminder.isCompleted ? 'Yes' : 'No'}</Text>
+					</Flex>
+					{reminder.isCompleted && (
+						<Flex direction='column'>
+							<Text size='sm'>Completed Date</Text>
+							{reminder.completedAt && <Text size='md'>{convertToTimestamp(reminder.completedAt)}</Text>}
+						</Flex>
+					)}
 				</Group>
 			</Card.Section>
 			<Divider my='md' />
@@ -47,11 +61,11 @@ export default function ReminderView({ reminder, promptDeleteReminder, toggleEdi
 				<Group grow spacing='xs'>
 					<Flex direction='column'>
 						<Text size='xs'>Task created</Text>
-						<Text size='sm'>{convertToTimestamp(reminder.created)}</Text>
+						<Text size='sm'>{convertToTimestamp(reminder.createdAt)}</Text>
 					</Flex>
 					<Flex direction='column'>
 						<Text size='xs'>Last updated</Text>
-						<Text size='sm'>{convertToTimestamp(reminder.updated)}</Text>
+						<Text size='sm'>{convertToTimestamp(reminder.updatedAt)}</Text>
 					</Flex>
 				</Group>
 			</Card.Section>

@@ -28,7 +28,7 @@ const defaultProps: RequiredReminderProps = {
 	edit: false,
 };
 
-export default function ReminderIDPage({ params, propsIn }: { params: { id: string }; propsIn: ReminderProps }) {
+function ReminderIDPage({ params, propsIn }: { params: { id: string }; propsIn: ReminderProps }) {
 	useProtectedRoute();
 	const { settings, loading } = useSettings();
 	const reminder = useUserDocument<ReminderFetch>((user) =>
@@ -131,3 +131,5 @@ export default function ReminderIDPage({ params, propsIn }: { params: { id: stri
 		</Container>
 	);
 }
+
+export default ReminderIDPage;

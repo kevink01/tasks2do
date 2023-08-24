@@ -43,10 +43,12 @@ export default function TaskView({ task, promptDeleteTask, toggleEditMode }: Tas
 						<Text size='sm'>Is completed</Text>
 						<Text size='md'>{task.isCompleted ? 'Yes' : 'No'}</Text>
 					</Flex>
-					<Flex direction='column'>
-						<Text size='sm'>Completed Date</Text>
-						{task.completedAt && <Text size='md'>{convertToTimestamp(task.completedAt)}</Text>}
-					</Flex>
+					{task.isCompleted && (
+						<Flex direction='column'>
+							<Text size='sm'>Completed Date</Text>
+							{task.completedAt && <Text size='md'>{convertToTimestamp(task.completedAt)}</Text>}
+						</Flex>
+					)}
 				</Group>
 			</Card.Section>
 			<Divider my='md' />

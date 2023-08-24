@@ -20,10 +20,10 @@ type ReminderCalenderProps = {
 
 function filterReminders(reminders: ReminderFetch[], date: Date): ReminderFetch[] {
 	return reminders
-		.filter((reminder) => getBeginningOfDay(reminder.complete).valueOf() === date.valueOf())
+		.filter((reminder) => getBeginningOfDay(reminder.dueDate).valueOf() === date.valueOf())
 		.sort((reminder1, reminder2) => {
-			const reminder1Time = reminder1.complete.seconds + reminder1.complete.nanoseconds / 1000000;
-			const reminder2Time = reminder2.complete.seconds + reminder2.complete.nanoseconds / 1000000;
+			const reminder1Time = reminder1.dueDate.seconds + reminder1.dueDate.nanoseconds / 1000000;
+			const reminder2Time = reminder2.dueDate.seconds + reminder2.dueDate.nanoseconds / 1000000;
 			return reminder1Time - reminder2Time || reminder1.name > reminder2.name
 				? 1
 				: reminder1.name < reminder2.name
@@ -39,7 +39,7 @@ export default function ReminderCalendar({ reminders }: ReminderCalenderProps) {
 		reminders: filterReminders(reminders, today.toDate()),
 	});
 	const days = reminders.map((reminder) => {
-		return getBeginningOfDay(reminder.complete).valueOf();
+		return getBeginningOfDay(reminder.dueDate).valueOf();
 	});
 
 	const [open, setOpen] = useState<boolean>(true);

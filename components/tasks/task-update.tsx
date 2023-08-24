@@ -75,7 +75,7 @@ export default function UpdateTask({ task, settings, promptDeleteTask, toggleEdi
 		const noChanges =
 			task.name === formValues.name &&
 			task.description === formValues.description &&
-			task.isCompleted === formValues.isCompleted &&
+			task.isCompleted === completed &&
 			getDate(task.dueDate).valueOf() === dates.dueDate.valueOf() &&
 			(task.completedAt
 				? dates.completedAt
@@ -123,11 +123,11 @@ export default function UpdateTask({ task, settings, promptDeleteTask, toggleEdi
 								<Text>New value: {dates.dueDate.toLocaleString()}</Text>
 							</Stack>
 						)}
-						{task.isCompleted !== formValues.isCompleted && (
+						{task.isCompleted !== completed && (
 							<Stack spacing='xs'>
 								<Text c='dimmed'>Is completed</Text>
 								<Text>Old value: {task.isCompleted ? 'Yes' : 'No'}</Text>
-								<Text>New value: {formValues.isCompleted ? 'Yes' : 'No'}</Text>
+								<Text>New value: {completed ? 'Yes' : 'No'}</Text>
 							</Stack>
 						)}
 						{(task.completedAt
@@ -301,12 +301,13 @@ export default function UpdateTask({ task, settings, promptDeleteTask, toggleEdi
 					</Stack>
 					<DateTimePicker
 						label='Completion date'
+						placeholder='Pick date and time'
 						withAsterisk
 						dropdownType='modal'
 						modalProps={{ centered: true }}
 						valueFormat='MM/DD/YYYY hh:mm A'
 						firstDayOfWeek={0}
-						disabled={completed && task.completedAt !== null}
+						disabled={!completed && task.completedAt === null}
 						value={dates.completedAt}
 						clearable
 						clearButtonProps={{
@@ -315,7 +316,6 @@ export default function UpdateTask({ task, settings, promptDeleteTask, toggleEdi
 									setCompleted(false);
 								}
 								setDates({ ...dates, completedAt: null });
-								console.log(dates);
 							},
 						}}
 					/>

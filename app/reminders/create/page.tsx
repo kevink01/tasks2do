@@ -25,6 +25,12 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaStickyNote } from 'react-icons/fa';
+import { getBeginningOfDate } from '@/util/time';
+
+type ReminderCreateDateProps = {
+	current: Date | null;
+	previous: Date | null;
+};
 
 export default function ReminderCreate() {
 	useProtectedRoute();
@@ -32,7 +38,7 @@ export default function ReminderCreate() {
 
 	const router = useRouter();
 
-	const [date, setDate] = useState<Date | null>(null);
+	const [dates, setDates] = useState<ReminderCreateDateProps>({ current: null, previous: null });
 	const [checked, setChecked] = useState<boolean>(false);
 
 	const {
@@ -45,13 +51,16 @@ export default function ReminderCreate() {
 	} = useForm<ReminderForm>();
 
 	const submit = () => {
-		if (!date) {
-			setError('complete', { message: 'Please enter a date', type: 'required' });
+		if (!dates.current) {
+			setError('dueDate', { message: 'Please enter a date', type: 'required' });
 			return;
 		}
-		register('complete', { value: checked ? moment(date).startOf('day').toDate() : date });
+		register('dueDate', { value: checked ? moment(dates.current).startOf('day').toDate() : dates.current });
 		register('allDay', { value: checked });
+		register('isCompleted', { value: false });
+		register('completedAt', { value: null });
 		const parsed = parse<ReminderForm>(reminderFormSchema, getValues());
+		console.log(parsed);
 		if (parsed.success) {
 			const id = notify(
 				`create-reminder-${parsed.data.name}`,
@@ -131,6 +140,10 @@ export default function ReminderCreate() {
 							<Switch
 								checked={checked}
 								onClick={() => {
+									setDates({
+										current: checked ? dates.previous : dates.previous ? getBeginningOfDate(dates.previous) : null,
+										previous: dates.current,
+									});
 									setChecked((mode) => !mode);
 								}}
 							/>
@@ -145,11 +158,12 @@ export default function ReminderCreate() {
 							minDate={new Date()}
 							firstDayOfWeek={0}
 							onChange={(e) => {
-								setDate(e);
-								clearErrors('complete');
+								setDates({ current: e, previous: dates.current });
+								clearErrors('dueDate');
 							}}
-							error={errors.complete?.message}
-							disabled={checked && date !== null}
+							error={errors.dueDate?.message}
+							disabled={checked && dates.current !== null}
+							value={dates.current}
 						/>
 					</Stack>
 					<Center mt={rem(10)}>

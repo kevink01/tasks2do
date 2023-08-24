@@ -22,7 +22,7 @@ export default function ReminderInfo({ reminder }: ReminderInfoProps) {
 								</Title>
 							</CustomLink>
 						</div>
-						<Text>{reminder.allDay ? 'All day' : getTime(getDate(reminder.complete))}</Text>
+						<Text>{reminder.allDay ? 'All day' : getTime(getDate(reminder.dueDate))}</Text>
 					</Group>
 					<Text>{reminder.description}</Text>
 				</Stack>

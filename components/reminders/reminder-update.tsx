@@ -39,6 +39,14 @@ type UpdateReminderProps = {
 	toggleEditMode: (mode?: boolean) => void;
 };
 
+type UpdateReminderDates = {
+	dueDate: {
+		current: Date;
+		previous: Date;
+	};
+	completedAt: Date | null;
+};
+
 export default function UpdateReminder({
 	reminder,
 	settings,
@@ -46,11 +54,15 @@ export default function UpdateReminder({
 	toggleEditMode,
 }: UpdateReminderProps) {
 	const { updateReminder } = useReminders();
-	const [dates, setDates] = useState<DateProps>({
-		current: getDate(reminder.complete),
-		previous: getDate(reminder.complete),
+	const [dates, setDates] = useState<UpdateReminderDates>({
+		dueDate: {
+			current: getDate(reminder.dueDate),
+			previous: getDate(reminder.dueDate),
+		},
+		completedAt: reminder.completedAt ? getDate(reminder.completedAt) : null,
 	});
 	const [allDay, setAllDay] = useState<boolean>(reminder.allDay);
+	const [completed, setCompleted] = useState<boolean>(reminder.isCompleted);
 	const router = useRouter();
 	const {
 		getValues,
@@ -62,17 +74,65 @@ export default function UpdateReminder({
 			name: reminder.name,
 			description: reminder.description,
 			allDay: reminder.allDay,
-			complete: getDate(reminder.complete),
+			dueDate: getDate(reminder.dueDate),
+			isCompleted: reminder.isCompleted,
+			completedAt: reminder.completedAt ? getDate(reminder.completedAt) : null,
 		},
 	});
 
 	const toggleAllDay = () => {
 		setDates((values) => ({
-			previous: values.current,
-			current: allDay ? values.previous! : getBeginningOfDate(values.current),
+			...dates,
+			dueDate: {
+				previous: values.dueDate.current,
+				current: allDay ? values.dueDate.previous : getBeginningOfDate(values.dueDate.current),
+			},
 		}));
 		setAllDay((mode) => !mode);
-		console.log(dates);
+	};
+
+	const toggleCompleted = () => {
+		if (completed) {
+			setDates({ ...dates, completedAt: null });
+		} else {
+			setDates({ ...dates, completedAt: reminder.completedAt ? getDate(reminder.completedAt) : new Date() });
+		}
+		setCompleted((checked) => !checked);
+	};
+
+	const promptResetChanges = () => {
+		modals.openConfirmModal({
+			centered: true,
+			title: 'Resetting changes',
+			children: (
+				<Container>
+					<Alert
+						icon={<FaExclamation />}
+						title='Are you sure you want to reset?'
+						color='yellow'
+						radius='xs'
+						mb={rem(4)}>
+						This action cannot be undone
+					</Alert>
+				</Container>
+			),
+			labels: { confirm: 'Confirm', cancel: 'Cancel' },
+			confirmProps: { color: 'green' },
+			onConfirm: () => {
+				setValue('name', reminder.name);
+				setValue('description', reminder.description);
+				setValue('isCompleted', reminder.isCompleted);
+				setCompleted(reminder.isCompleted);
+				setValue('allDay', reminder.allDay);
+				setAllDay(reminder.allDay);
+				setValue('dueDate', getDate(reminder.dueDate));
+				setValue('completedAt', reminder.completedAt ? getDate(reminder.completedAt) : null);
+				setDates({
+					dueDate: { current: getDate(reminder.dueDate), previous: getDate(reminder.dueDate) },
+					completedAt: reminder.completedAt ? getDate(reminder.completedAt) : null,
+				});
+			},
+		});
 	};
 
 	const promptUpdateReminder = () => {
@@ -81,7 +141,13 @@ export default function UpdateReminder({
 			reminder.name === formValues.name &&
 			reminder.description === formValues.description &&
 			reminder.allDay === allDay &&
-			getDate(reminder.complete).valueOf() === (dates.current?.valueOf() ?? formValues.complete.valueOf());
+			reminder.isCompleted === completed &&
+			getDate(reminder.dueDate).valueOf() === dates.dueDate.current?.valueOf() &&
+			(reminder.completedAt
+				? dates.completedAt
+					? getDate(reminder.completedAt).valueOf() === dates.completedAt.valueOf()
+					: false
+				: dates.completedAt === null);
 		modals.openConfirmModal({
 			centered: true,
 			title: 'Updating task',
@@ -119,19 +185,37 @@ export default function UpdateReminder({
 						{reminder.allDay !== allDay && (
 							<Stack spacing='xs'>
 								<Text c='dimmed'>All day</Text>
-								<Text>Old value: {reminder.allDay ? 'true' : 'false'}</Text>
-								<Text>New value: {allDay ? 'true' : 'false'}</Text>
+								<Text>Old value: {reminder.allDay ? 'Yes' : 'No'}</Text>
+								<Text>New value: {allDay ? 'Yes' : 'No'}</Text>
 							</Stack>
 						)}
-						{getDate(reminder.complete).valueOf() !== (dates.current.valueOf() ?? formValues.complete.valueOf()) && (
+						{getDate(reminder.dueDate).valueOf() !== dates.dueDate.current.valueOf() && (
 							<Stack spacing='xs'>
-								<Text c='dimmed'>Complete date</Text>
+								<Text c='dimmed'>Due date</Text>
 								<Text>
-									Old value: {reminder ? getDate(reminder.complete).toLocaleString() : new Date().toLocaleString()}
+									Old value: {reminder ? getDate(reminder.dueDate).toLocaleString() : new Date().toLocaleString()}
 								</Text>
-								<Text>
-									New value: {dates.current ? dates.current.toLocaleString() : formValues.complete.toLocaleString()}
-								</Text>
+								<Text>New value: {dates.dueDate.current.toLocaleString()}</Text>
+							</Stack>
+						)}
+						{reminder.isCompleted !== completed && (
+							<Stack spacing='xs'>
+								<Text c='dimmed'>Is completed</Text>
+								<Text>Old value: {reminder.isCompleted ? 'Yes' : 'No'}</Text>
+								<Text>New value: {completed ? 'Yes' : 'No'}</Text>
+							</Stack>
+						)}
+						{(reminder.completedAt
+							? dates.completedAt
+								? getDate(reminder.completedAt).valueOf() !== dates.completedAt.valueOf()
+								: true
+							: dates.completedAt !== null) && (
+							<Stack spacing='xs'>
+								<Text c='dimmed'>Completed date</Text>
+								{reminder.completedAt && <Text>Old value: {getDate(reminder.completedAt).toLocaleString()}</Text>}
+								{dates.completedAt && <Text>New value: {dates.completedAt.toLocaleString()}</Text>}
+								{!reminder.completedAt && <Text fs='italic'>(No previous date)</Text>}
+								{!dates.completedAt && <Text fs='iatlic'>(No more completion date)</Text>}
 							</Stack>
 						)}
 					</Stack>
@@ -140,8 +224,10 @@ export default function UpdateReminder({
 			labels: { confirm: 'Confirm', cancel: 'Cancel' },
 			confirmProps: { color: 'green', disabled: noChanges },
 			onConfirm: () => {
-				setValue('complete', dates.current);
+				setValue('isCompleted', completed);
+				setValue('dueDate', dates.dueDate.current);
 				setValue('allDay', allDay);
+				setValue('completedAt', completed ? (reminder.completedAt ? dates.completedAt : new Date()) : null);
 				const id = notify(
 					`update-reminder-${reminder.id}`,
 					`Updating reminder: ${reminder.name}`,
@@ -182,9 +268,13 @@ export default function UpdateReminder({
 			onConfirm: () => {
 				setValue('name', reminder.name);
 				setValue('description', reminder.description);
-				const resetDate = getDate(reminder.complete);
-				setValue('complete', resetDate);
-				setDates({ current: resetDate, previous: resetDate });
+				const resetDate = getDate(reminder.dueDate);
+				setValue('dueDate', resetDate);
+				setValue('completedAt', reminder.completedAt ? getDate(reminder.completedAt) : null);
+				setDates({
+					dueDate: { current: resetDate, previous: resetDate },
+					completedAt: reminder.completedAt ? getDate(reminder.completedAt) : null,
+				});
 				toggleEditMode(false);
 			},
 		});
@@ -192,7 +282,7 @@ export default function UpdateReminder({
 
 	return (
 		<div>
-			<Card.Section ml={rem(4)} pt={rem(4)}>
+			<Card.Section mx={rem(4)} pt={rem(4)}>
 				<Flex direction='column' gap='xs'>
 					<TextInput
 						placeholder='Task name'
@@ -218,40 +308,85 @@ export default function UpdateReminder({
 					/>
 				</Flex>
 			</Card.Section>
-			<Card.Section ml={rem(4)} pt={rem(4)}>
-				<Stack spacing={0}>
-					<Group spacing={5}>
-						<Text size='sm' color='white'>
-							All day
-						</Text>
-						<Text color='red'>*</Text>
-					</Group>
-					<Switch checked={allDay} onClick={toggleAllDay} />
-				</Stack>
-
-				<DateTimePicker
-					label='Completion date'
-					placeholder='Pick date and time'
-					withAsterisk
-					dropdownType='modal'
-					modalProps={{ centered: true }}
-					valueFormat='MM/DD/YYYY hh:mm A'
-					minDate={new Date()}
-					firstDayOfWeek={0}
-					onChange={(e) => {
-						setDates((values) => ({ previous: values.current, current: new Date(e!.getTime()) }));
-						console.log(dates);
-					}}
-					defaultValue={getDate(reminder.complete)}
-					disabled={allDay}
-					value={dates.current}
-				/>
+			<Divider my='xs' />
+			<Card.Section mx={rem(4)} pt={rem(4)}>
+				<Group spacing='lg' align='top'>
+					<Stack spacing={0} miw={rem(150)}>
+						<Group spacing={5}>
+							<Text size='sm' color='white'>
+								All day
+							</Text>
+							<Text color='red'>*</Text>
+						</Group>
+						<Switch checked={allDay} onClick={toggleAllDay} />
+					</Stack>
+					<div className='flex-1'>
+						<DateTimePicker
+							label='Due date'
+							placeholder='Pick date and time'
+							withAsterisk
+							dropdownType='modal'
+							modalProps={{ centered: true }}
+							valueFormat='MM/DD/YYYY hh:mm A'
+							minDate={new Date()}
+							firstDayOfWeek={0}
+							onChange={(e) => {
+								setDates((values) => ({
+									...values,
+									dueDate: { previous: values.dueDate.current, current: new Date(e!.getTime()) },
+								}));
+							}}
+							defaultValue={getDate(reminder.dueDate)}
+							disabled={allDay}
+							value={dates.dueDate.current}
+						/>
+					</div>
+				</Group>
+			</Card.Section>
+			<Divider my='xs' />
+			<Card.Section mx={rem(4)} pt={rem(4)}>
+				<Group spacing='lg' align='top'>
+					<Stack spacing={0} miw={rem(150)}>
+						<Group spacing={5}>
+							<Text size='sm' color='white'>
+								Reminder completed
+							</Text>
+							<Text color='red'>*</Text>
+						</Group>
+						<Switch checked={completed} onClick={toggleCompleted} />
+					</Stack>
+					<div className='flex-1'>
+						<DateTimePicker
+							label='Completion date'
+							placeholder='Pick date and time'
+							withAsterisk
+							dropdownType='modal'
+							modalProps={{ centered: true }}
+							valueFormat='MM/DD/YYYY hh:mm A'
+							firstDayOfWeek={0}
+							disabled={!completed && reminder.completedAt === null}
+							value={dates.completedAt}
+							clearable
+							clearButtonProps={{
+								onClick: () => {
+									if (completed) {
+										setCompleted(false);
+									}
+									setDates({ ...dates, completedAt: null });
+								},
+							}}
+						/>
+					</div>
+				</Group>
 			</Card.Section>
 			<Divider my='sm' />
-			<Card.Section ml={rem(4)} pt={rem(4)} pb={rem(10)}>
+			<Card.Section mx={rem(4)} pt={rem(4)} pb={rem(10)}>
 				<Group spacing='sm'>
 					<Button color='green' onClick={promptUpdateReminder}>
 						Confirm changes
+					</Button>
+					<Button color='blue' onClick={promptResetChanges}>
+						Reset changes
 					</Button>
 					<Button color='yellow' onClick={promptCancelChanges}>
 						Discard changes

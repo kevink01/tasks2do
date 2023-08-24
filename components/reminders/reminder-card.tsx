@@ -4,7 +4,7 @@ import useReminders from '@/hooks/use-reminders';
 import { useSettings } from '@/hooks/use-settings';
 import { ReminderFetch } from '@/types/reminder';
 import { convertToDay, convertToTimestamp, daysRemaining, getColor } from '@/util/time';
-import { Alert, Box, Button, Card, Container, Divider, Grid, Group, rem, Text } from '@mantine/core';
+import { Alert, Box, Button, Card, Checkbox, Container, Divider, Grid, Group, rem, Stack, Text } from '@mantine/core';
 import React from 'react';
 import CustomLink from '../custom-link';
 import { FaExclamation, FaPen, FaTrash } from 'react-icons/fa';
@@ -16,7 +16,22 @@ type ReminderCardProps = {
 };
 
 export default function ReminderCard({ reminder }: ReminderCardProps) {
-	const { deleteReminder } = useReminders();
+	const { markComplete, deleteReminder } = useReminders();
+
+	const markReminderAsComplete = (checked: boolean) => {
+		const result = markComplete(reminder, checked);
+		if (!result.success) {
+			notify(
+				`check-task-${reminder.id}-${Date.now()}`,
+				'Error!',
+				'Unable to complete reminder',
+				false,
+				settings,
+				'error'
+			);
+		}
+	};
+
 	const { settings } = useSettings();
 
 	const promptDeleteReminder = () => {
@@ -51,34 +66,54 @@ export default function ReminderCard({ reminder }: ReminderCardProps) {
 		});
 	};
 
-	const date = daysRemaining(reminder.complete);
+	const date = daysRemaining(reminder.dueDate);
 
 	return (
 		<Grid.Col span={4} key={reminder.id}>
 			<Card shadow='sm' padding='sm' radius='md' withBorder className='hover:cursor-pointer'>
 				<Card.Section mx={rem(4)}>
-					<CustomLink href={`/reminders/${reminder.id}`}>
-						<Text size='xl' td='underline'>
-							{reminder.name}
-						</Text>
-					</CustomLink>
-					<Text fs='italic' lineClamp={1}>
-						{reminder.description}
-					</Text>
+					<Group align='top'>
+						<Checkbox
+							color='orange'
+							radius='xl'
+							size='lg'
+							defaultChecked={reminder.isCompleted}
+							mt={rem(10)}
+							onChange={(e) => markReminderAsComplete(e.currentTarget.checked)}
+						/>
+						<Stack spacing={0} align='top'>
+							<CustomLink href={`/reminders/${reminder.id}`}>
+								<Text size='xl' td='underline'>
+									{reminder.name}
+								</Text>
+								<Text></Text>
+							</CustomLink>
+							<Text fs='italic' lineClamp={1}>
+								{reminder.description.length === 0 ? '(No description)' : reminder.description}
+							</Text>
+						</Stack>
+					</Group>
 					<Divider />
 					<Text size='md'>
 						<Text fs='italic'>Complete on:</Text>
 						<Group>
 							{reminder.allDay ? (
 								<>
-									<Text>{convertToDay(reminder.complete, reminder.allDay)}</Text>
+									<Text>{convertToDay(reminder.dueDate, reminder.allDay)}</Text>
 									<Text color='blue'>(All day)</Text>
 								</>
 							) : (
-								<Text>{convertToDay(reminder.complete, reminder.allDay)}</Text>
+								<Text>{convertToDay(reminder.dueDate, reminder.allDay)}</Text>
 							)}
 						</Group>
-						<Text color={getColor(date)}>{`(${date.message})`}</Text>
+						{reminder.isCompleted ? (
+							<>
+								<Text fs='italic'>Completed on:</Text>
+								<Text>{reminder.completedAt && convertToTimestamp(reminder.completedAt)}</Text>
+							</>
+						) : (
+							<Text color={getColor(date)}>{`(${date.message})`}</Text>
+						)}
 					</Text>
 				</Card.Section>
 				<Card.Section mx={rem(4)} mt={rem(4)} mb={rem(4)}>
@@ -97,11 +132,11 @@ export default function ReminderCard({ reminder }: ReminderCardProps) {
 				<Card.Section mx={rem(4)} pb={rem(4)}>
 					<Text fz='sm' display='flex' sx={{ gap: rem(4) }}>
 						<Text fs='italic'>Created on:</Text>
-						<Text>{convertToTimestamp(reminder.created)}</Text>
+						<Text>{convertToTimestamp(reminder.createdAt)}</Text>
 					</Text>
 					<Text fz='sm' display='flex' sx={{ gap: rem(4) }}>
 						<Text fs='italic'>Last updated:</Text>
-						<Text>{convertToTimestamp(reminder.updated)}</Text>
+						<Text>{convertToTimestamp(reminder.updatedAt)}</Text>
 					</Text>
 				</Card.Section>
 			</Card>

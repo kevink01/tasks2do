@@ -18,7 +18,7 @@ export default function NoReminders() {
 			</Stack>
 			<Center mx='auto' my='xl'>
 				<Button size='sm' color='orange' onClick={() => router.push('/reminders/create')}>
-					Create reminders
+					Create reminder
 				</Button>
 			</Center>
 		</Card>
