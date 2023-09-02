@@ -1,3 +1,4 @@
+import { timestamp } from '@/util/parse/timestamp';
 import { z } from 'zod';
 
 export const taskFormSchema = z.object({
@@ -22,10 +23,10 @@ export type Task = z.infer<typeof taskSchema>;
 
 export const taskFetchSchema = taskSchema.merge(
 	z.object({
-		dueDate: z.object({ seconds: z.number(), nanoseconds: z.number() }),
-		completedAt: z.object({ seconds: z.number(), nanoseconds: z.number() }).nullable(),
-		createdAt: z.object({ seconds: z.number(), nanoseconds: z.number() }),
-		updatedAt: z.object({ seconds: z.number(), nanoseconds: z.number() }),
+		dueDate: timestamp,
+		completedAt: timestamp.nullable(),
+		createdAt: timestamp,
+		updatedAt: timestamp,
 	})
 );
 

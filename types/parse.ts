@@ -5,7 +5,7 @@ type Parse<T> =
 			success: true;
 			data: T;
 	  }
-	| { success: false; errors: { code: string; message: string }[] };
+	| { success: false; errors: { code: string; path: (string | number)[]; message: string }[] };
 
 export const parse = <T>(schema: z.Schema<T>, data: unknown): Parse<T> => {
 	try {
@@ -19,6 +19,7 @@ export const parse = <T>(schema: z.Schema<T>, data: unknown): Parse<T> => {
 				errors: error.issues.map((err) => {
 					return {
 						code: err.code,
+						path: err.path,
 						message: err.message,
 					};
 				}),
@@ -29,6 +30,7 @@ export const parse = <T>(schema: z.Schema<T>, data: unknown): Parse<T> => {
 				errors: [
 					{
 						code: 'custom',
+						path: ['unknown'],
 						message: 'Unknown error',
 					},
 				],

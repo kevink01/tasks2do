@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { timestamp } from '@/util/parse/timestamp';
 
 export const reminderFormSchema = z.object({
 	name: z.string().min(3, 'Minimum reminder name is 3 characters'),
@@ -23,10 +24,10 @@ export type Reminder = z.infer<typeof reminderSchema>;
 
 export const reminderFetchSchema = reminderSchema.merge(
 	z.object({
-		dueDate: z.object({ seconds: z.number(), nanoseconds: z.number() }),
-		completedAt: z.object({ seconds: z.number(), nanoseconds: z.number() }).nullable(),
-		createdAt: z.object({ seconds: z.number(), nanoseconds: z.number() }),
-		updatedAt: z.object({ seconds: z.number(), nanoseconds: z.number() }),
+		dueDate: timestamp,
+		completedAt: timestamp.nullable(),
+		createdAt: timestamp,
+		updatedAt: timestamp,
 	})
 );
 

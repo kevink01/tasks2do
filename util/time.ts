@@ -57,15 +57,39 @@ export function convertToDay(timestamp: FirebaseTimestamp, includeTime: boolean 
 /**
  * Returns the beginning of the day
  * @param timestamp The firebase timestamp (includes seconds & nanoseconds)
- * @returns Date at 12:00 AM
+ * @returns Date At 12:00 AM
  */
 export function getBeginningOfDay(timestamp: FirebaseTimestamp): Date {
 	const date = getDate(timestamp);
 	return moment(date).startOf('day').toDate();
 }
 
+/**
+ * Returns the end of the day
+ * @param timestamp The firebase timestamp (includes seconds & nanoseconds)
+ * @returns At 11:59:59 PM
+ */
+export function getEndOfDay(timestamp: FirebaseTimestamp): Date {
+	const date = getDate(timestamp);
+	return moment(date).endOf('day').toDate();
+}
+
+/**
+ * Returns the beginning of the day
+ * @param date Date
+ * @returns At 12:00:00 AM
+ */
 export function getBeginningOfDate(date: Date): Date {
 	return moment(date).startOf('day').toDate();
+}
+
+/**
+ * Returns the end of the day
+ * @param date Date
+ * @returns At 11:59:59 PM
+ */
+export function getEndOfDate(date: Date): Date {
+	return moment(date).endOf('day').toDate();
 }
 
 /**

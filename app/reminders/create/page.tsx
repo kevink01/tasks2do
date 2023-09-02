@@ -118,7 +118,7 @@ export default function ReminderCreate() {
 							{...register('name', {
 								minLength: {
 									value: 3,
-									message: 'Minimum length is 5',
+									message: 'Minimum length is 3',
 								},
 							})}
 						/>
