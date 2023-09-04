@@ -151,7 +151,7 @@ export default function ReminderCalendar({ reminders }: ReminderCalenderProps) {
 							{dateReminders.reminders.length === 0 ? (
 								<Stack spacing='xs'>
 									<Text align='center'>No tasks for this day</Text>
-									<Text align='center'>How about we create some tasks?</Text>
+									<Text align='center'>How about we create some reminders?</Text>
 									<Center>
 										<CustomLink href='/reminders/create'>
 											<Button color='orange' mx='auto'>

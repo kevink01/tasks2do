@@ -74,7 +74,7 @@ export default function Events() {
 							) : (
 								<Grid gutter={5}>
 									{events.map((event) => {
-										return <EventCard key={event.id} event={event} />;
+										return <EventCard key={event.id} event={event} settings={settings} />;
 									})}
 								</Grid>
 							)}
