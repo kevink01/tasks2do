@@ -134,7 +134,7 @@ export default function ReminderCreate() {
 						/>
 						<Stack spacing={0}>
 							<Text size='sm' color='white'>
-								All day task
+								All day reminder
 							</Text>
 							<Switch
 								checked={checked}
@@ -167,7 +167,7 @@ export default function ReminderCreate() {
 					</Stack>
 					<Center mt={rem(10)}>
 						<Button type='submit' color='orange'>
-							Create task
+							Create reminder
 						</Button>
 					</Center>
 				</Box>

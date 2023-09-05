@@ -128,6 +128,7 @@ export default function EventCreate() {
 		register('notification', { value: notification });
 
 		const parsed = parse<EventForm>(eventFormSchema, getValues());
+		console.log(parsed);
 		if (parsed.success) {
 			const id = notify(
 				`create-event-${parsed.data.name}`,
@@ -371,7 +372,7 @@ export default function EventCreate() {
 							</Stack>
 							<Center mt={rem(10)}>
 								<Button type='submit' color='orange'>
-									Create task
+									Create event
 								</Button>
 							</Center>
 						</>

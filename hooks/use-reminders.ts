@@ -47,7 +47,6 @@ export default function useReminders(): RemindersInstance {
 				createdAt: getDate(oldReminder.createdAt),
 				updatedAt: now,
 			});
-
 			if (parsed.success) {
 				setDoc(doc(getFirestore(), `/users/${user.uid}/reminders/${oldReminder.id}`), parsed.data);
 				return { success: true, data: parsed.data };

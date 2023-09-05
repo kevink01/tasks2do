@@ -31,11 +31,11 @@ export default function Events() {
 
 	return (
 		<Container size='lg' px='xs'>
-			<Accordion defaultValue='reminders' pb={rem(10)}>
-				<Accordion.Item value='reminders'>
+			<Accordion defaultValue='events' pb={rem(10)}>
+				<Accordion.Item value='events'>
 					<Box sx={{ display: 'flex', alignItems: 'center', gap: rem(10) }}>
 						<Accordion.Control>Events</Accordion.Control>
-						<CustomLink href='/reminders/create'>
+						<CustomLink href='/events/create'>
 							<Button color='orange'>Create event</Button>
 						</CustomLink>
 						<Tooltip

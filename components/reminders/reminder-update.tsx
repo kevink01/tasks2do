@@ -26,11 +26,6 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaCalendarCheck, FaExclamation, FaQuestionCircle } from 'react-icons/fa';
 
-type DateProps = {
-	current: Date;
-	previous: Date;
-};
-
 type UpdateReminderProps = {
 	reminder: ReminderFetch;
 	settings: Settings;
@@ -150,7 +145,7 @@ export default function UpdateReminder({
 				: dates.completedAt === null);
 		modals.openConfirmModal({
 			centered: true,
-			title: 'Updating task',
+			title: 'Updating reminder',
 			children: (
 				<Container>
 					{noChanges ? (
@@ -285,7 +280,7 @@ export default function UpdateReminder({
 			<Card.Section mx={rem(4)} pt={rem(4)}>
 				<Flex direction='column' gap='xs'>
 					<TextInput
-						placeholder='Task name'
+						placeholder='Reminder name'
 						label='Name'
 						radius='md'
 						size='md'
@@ -299,7 +294,7 @@ export default function UpdateReminder({
 						})}
 					/>
 					<TextInput
-						placeholder='Task description'
+						placeholder='Reminder description'
 						label='Description'
 						radius='md'
 						size='md'

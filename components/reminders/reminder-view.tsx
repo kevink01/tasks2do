@@ -18,7 +18,7 @@ export default function ReminderView({ reminder, promptDeleteReminder, toggleEdi
 			<Card.Section ml={rem(4)} pt={rem(4)}>
 				<Flex direction='column' gap='xs'>
 					<Flex direction='column'>
-						<Text size='sm'>Task name</Text>
+						<Text size='sm'>Reminder name</Text>
 						<Text size='xl'>{reminder.name}</Text>
 					</Flex>
 					<Flex direction='column'>
@@ -60,7 +60,7 @@ export default function ReminderView({ reminder, promptDeleteReminder, toggleEdi
 			<Card.Section ml={rem(4)} pt={rem(4)}>
 				<Group grow spacing='xs'>
 					<Flex direction='column'>
-						<Text size='xs'>Task created</Text>
+						<Text size='xs'>Reminder created</Text>
 						<Text size='sm'>{convertToTimestamp(reminder.createdAt)}</Text>
 					</Flex>
 					<Flex direction='column'>
@@ -73,10 +73,10 @@ export default function ReminderView({ reminder, promptDeleteReminder, toggleEdi
 			<Card.Section ml={rem(4)} pt={rem(4)} pb={rem(10)}>
 				<Group spacing='sm'>
 					<Button color='orange' onClick={() => toggleEditMode(true)}>
-						Update task
+						Update reminder
 					</Button>
 					<Button color='red' onClick={promptDeleteReminder}>
-						Delete task
+						Delete reminder
 					</Button>
 				</Group>
 			</Card.Section>

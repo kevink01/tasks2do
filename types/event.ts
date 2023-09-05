@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { reminderSchema } from '@/types/reminder';
 import { timestamp } from '@/util/parse/timestamp';
 
 export const notificationUnitOptions = ['minutes', 'hours', 'days', 'weeks'] as const;
@@ -9,14 +8,10 @@ export type NotificationUnitOptions = (typeof notificationUnitOptions)[number];
 export const eventFormSchema = z.object({
 	name: z.string().min(3, 'Minimum event name is 3 characters'),
 	description: z.string(),
-	time: z
-		.object({
-			start: z.date(),
-			end: z.date(),
-		})
-		.refine((values) => values.end.valueOf() > values.start.valueOf(), {
-			message: 'End time must be before start time',
-		}),
+	time: z.object({
+		start: z.date(),
+		end: z.date(),
+	}),
 	allDay: z.boolean(),
 	notification: z.object({
 		duration: z.number(),
@@ -51,7 +46,7 @@ export const eventSchema = eventFormSchema.merge(
 
 export type Event = z.infer<typeof eventSchema>;
 
-export const eventFetchSchema = reminderSchema.merge(
+export const eventFetchSchema = eventSchema.merge(
 	z.object({
 		time: z.object({
 			start: timestamp,

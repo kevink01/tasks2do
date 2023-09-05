@@ -3,7 +3,7 @@
 import { useEvents } from '@/hooks/use-events';
 import { EventFetch } from '@/types/event';
 import { Settings } from '@/types/settings';
-import { notify } from '@/util/notifications/notify';
+import { notify, updateNotification } from '@/util/notifications/notify';
 import { convertToDay, convertToTimestamp, daysRemaining } from '@/util/time';
 import { Alert, Box, Button, Card, Container, Divider, Grid, Group, rem, Stack, Text } from '@mantine/core';
 import { modals } from '@mantine/modals';
@@ -16,7 +16,7 @@ type EventCardProps = {
 };
 
 export default function EventCard({ event, settings }: EventCardProps) {
-	// const { deleteEvent } = useEvents();
+	const { deleteEvent } = useEvents();
 
 	const promptDeleteEvent = () => {
 		modals.openConfirmModal({
@@ -40,12 +40,12 @@ export default function EventCard({ event, settings }: EventCardProps) {
 					settings,
 					'info'
 				);
-				// const result = deleteEvent(event);
-				// if (result.success) {
-				// 	updateNotification(id, 'Success', 'Successfully deleted this event', settings, 'success', <FaTrash />);
-				// } else {
-				// 	updateNotification(id, 'Error', 'Unable to delete event', settings, 'error');
-				// }
+				const result = deleteEvent(event);
+				if (result.success) {
+					updateNotification(id, 'Success', 'Successfully deleted this event', settings, 'success', <FaTrash />);
+				} else {
+					updateNotification(id, 'Error', 'Unable to delete event', settings, 'error');
+				}
 			},
 		});
 	};
@@ -87,14 +87,14 @@ export default function EventCard({ event, settings }: EventCardProps) {
 				</Card.Section>
 				<Card.Section mx={rem(4)} mt={rem(4)} mb={rem(4)}>
 					<Box sx={{ display: 'flex', gap: rem(4) }}>
-						<CustomLink href={`/reminders/${event.id}?edit=true`}>
+						<CustomLink href={`/events/${event.id}?edit=true`}>
 							<Button color='orange' leftIcon={<FaPen />}>
-								Update reminder
+								Update event
 							</Button>
 						</CustomLink>
 
 						<Button color='red' leftIcon={<FaTrash />} onClick={promptDeleteEvent}>
-							Delete reminder
+							Delete event
 						</Button>
 					</Box>
 				</Card.Section>

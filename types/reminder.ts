@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { timestamp } from '@/util/parse/timestamp';
 
 export const reminderFormSchema = z.object({
-	name: z.string().min(3, 'Minimum reminder name is 3 characters'),
+	name: z.string().min(5, 'Minimum reminder name is 3 characters'),
 	description: z.string(),
 	dueDate: z.date(),
 	allDay: z.boolean(),
